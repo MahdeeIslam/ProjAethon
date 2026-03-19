@@ -76,6 +76,11 @@ export default function HeroShowreel() {
   const show = reduceMotion || mounted
   const useYouTube = isYouTubeUrl(videoSrc)
 
+  useEffect(() => {
+    // YouTube embeds don't fire <video> events; remove the overlay immediately.
+    if (useYouTube) setShowPoster(false)
+  }, [useYouTube])
+
   return (
     <section
       ref={sectionRef}
