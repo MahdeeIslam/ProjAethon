@@ -7,7 +7,8 @@
  */
 
 export const YT = {
-  heroBackground: 'https://youtube.com/shorts/pZjopRHhugc?feature=share',
+  // Use a horizontal video for the hero background.
+  heroBackground: 'https://youtu.be/uiZELAehGNM',
   heroLoop: 'https://youtu.be/XIVQ-LYGflw',
   horizontalReels: [
     'https://youtu.be/XK_wiMNxfCE', // Elders promo (uncaptioned)
