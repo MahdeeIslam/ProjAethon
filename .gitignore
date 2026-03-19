@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+
+# Placeholder media (large binaries). Keep directories/README/.gitkeep in Git.
+public/placeholders/**/*.mp4
+public/placeholders/**/*.MP4
