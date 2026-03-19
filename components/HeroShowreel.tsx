@@ -29,7 +29,7 @@ const MOTION_DELAYS = { eyebrow: 0, headline: 150, subtext: 300, buttons: 450, m
 export default function HeroShowreel() {
   const [audioEnabled, setAudioEnabled] = useState(false)
   const [showPoster, setShowPoster] = useState(true)
-  const [videoSrc, setVideoSrc] = useState(HERO_VIDEO_SRC)
+  const [videoSrc, setVideoSrc] = useState<string>(HERO_VIDEO_SRC)
   const [mounted, setMounted] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
   const [parallaxY, setParallaxY] = useState(0)
