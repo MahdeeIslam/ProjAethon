@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { shuffleArray } from '@/lib/shuffle'
+import { getReelShuffleSeed, shuffleDeterministic } from '@/lib/shuffle'
 import Container from '@/components/ui/Container'
 import Reveal from '@/components/motion/Reveal'
 import { YT } from '@/data/videoUrls'
-import { isYouTubeUrl } from '@/lib/youtube'
-import YouTubeEmbed from '@/components/YouTubeEmbed'
+import { normalizeReelInput } from '@/lib/media/normalizeReel'
+import ReelSurface from '@/components/media/ReelSurface'
 
 const FALLBACK_REEL_PATHS = [...YT.verticalReels]
 
@@ -26,21 +26,14 @@ interface ReelTile {
   variant: 'featured' | 'secondary' | 'grid'
 }
 
-function encodeReelPath(path: string): string {
-  return path
-    .split('/')
-    .map((seg) => encodeURIComponent(seg))
-    .join('/')
-}
-
 function ReelTileCard({ tile }: { tile: ReelTile }) {
   const [videoFailed, setVideoFailed] = useState(false)
   const [videoLoaded, setVideoLoaded] = useState(false)
-  const src = encodeReelPath(tile.src)
-  const useYouTube = isYouTubeUrl(tile.src)
+  const reel = useMemo(() => normalizeReelInput(tile.src), [tile.src])
+
   useEffect(() => {
-    if (useYouTube) setVideoLoaded(true)
-  }, [useYouTube])
+    if (reel.source === 'youtube') setVideoLoaded(true)
+  }, [reel.source])
 
   const heightClass =
     tile.variant === 'featured'
@@ -56,30 +49,19 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
     >
       <div className="absolute inset-0 bg-[#252525]">
         {!videoFailed && (
-          useYouTube ? (
-            <YouTubeEmbed
-              url={tile.src}
-              title={tile.title}
-              autoplay
-              muted
-              loop
-              controls={false}
-              className={`h-full w-full transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-            />
-          ) : (
-            <video
-              src={src}
-              muted
-              loop
-              playsInline
-              autoPlay
-              preload="metadata"
-              onError={() => setVideoFailed(true)}
-              onLoadedData={() => setVideoLoaded(true)}
-              className={`h-full w-full object-cover transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-              style={{ filter: 'saturate(1.05) contrast(1.02)' }}
-            />
-          )
+          <ReelSurface
+            reel={reel}
+            context="grid"
+            title={tile.title}
+            autoplay
+            muted
+            loop
+            reduceMotion={false}
+            mediaClassName={`transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+            videoStyle={{ filter: 'saturate(1.05) contrast(1.02)' }}
+            onVideoError={() => setVideoFailed(true)}
+            onVideoReady={() => setVideoLoaded(true)}
+          />
         )}
         {videoFailed && (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#3a3a3a] to-[#1a1a1a]">
@@ -119,21 +101,32 @@ export default function VerticalReelsCarousel() {
       .catch(() => setReelPaths(FALLBACK_REEL_PATHS))
   }, [])
 
+  const basePool = useMemo(() => {
+    const merged = reelPaths.length > 0 ? reelPaths : FALLBACK_REEL_PATHS
+    return [...merged].sort((a, b) => a.localeCompare(b))
+  }, [reelPaths])
+
+  const [shuffledPool, setShuffledPool] = useState<string[] | null>(null)
+  useEffect(() => {
+    setShuffledPool(shuffleDeterministic([...basePool], `${getReelShuffleSeed()}-vert-carousel`))
+  }, [basePool])
+
+  const paths = shuffledPool ?? basePool
+
   const tiles = useMemo((): ReelTile[] => {
-    const paths = reelPaths.length > 0 ? shuffleArray([...reelPaths]) : FALLBACK_REEL_PATHS
     const titles = ['FairDinkum Podcast', 'Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series']
     const categories = ['Institutional', 'Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital']
     const years = ['2024', '2024', '2024', '2023', '2024', '2023']
 
     return [
-      { src: paths[0], title: titles[0], category: categories[0], year: years[0], variant: 'featured' },
-      { src: paths[1], title: titles[1], category: categories[1], year: years[1], variant: 'secondary' },
-      { src: paths[2], title: titles[2], category: categories[2], year: years[2], variant: 'secondary' },
-      { src: paths[3], title: titles[3], category: categories[3], year: years[3], variant: 'grid' },
-      { src: paths[4], title: titles[4], category: categories[4], year: years[4], variant: 'grid' },
-      { src: paths[5], title: titles[5], category: categories[5], year: years[5], variant: 'grid' },
+      { src: paths[0] ?? FALLBACK_REEL_PATHS[0], title: titles[0], category: categories[0], year: years[0], variant: 'featured' },
+      { src: paths[1] ?? paths[0] ?? FALLBACK_REEL_PATHS[1], title: titles[1], category: categories[1], year: years[1], variant: 'secondary' },
+      { src: paths[2] ?? paths[0] ?? FALLBACK_REEL_PATHS[2], title: titles[2], category: categories[2], year: years[2], variant: 'secondary' },
+      { src: paths[3] ?? paths[0] ?? FALLBACK_REEL_PATHS[3], title: titles[3], category: categories[3], year: years[3], variant: 'grid' },
+      { src: paths[4] ?? paths[0] ?? FALLBACK_REEL_PATHS[4], title: titles[4], category: categories[4], year: years[4], variant: 'grid' },
+      { src: paths[5] ?? paths[0] ?? FALLBACK_REEL_PATHS[5], title: titles[5], category: categories[5], year: years[5], variant: 'grid' },
     ]
-  }, [reelPaths])
+  }, [paths])
 
   return (
     <section

@@ -2,6 +2,12 @@
 
 import { toYouTubeEmbedUrl } from '@/lib/youtube'
 
+const iframeAllow =
+  'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+
+/**
+ * Plain YouTube iframe (no “cover” math). Use `YouTubeCover` + `ReelSurface` for full-bleed / cropped embeds.
+ */
 export default function YouTubeEmbed({
   url,
   title,
@@ -27,10 +33,9 @@ export default function YouTubeEmbed({
       className={className}
       src={embed}
       title={title}
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allow={iframeAllow}
       referrerPolicy="strict-origin-when-cross-origin"
       allowFullScreen
     />
   )
 }
-

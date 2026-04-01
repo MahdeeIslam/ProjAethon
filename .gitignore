@@ -1,3 +1,8 @@
 node_modules/
 .DS_Store
 .tools/
+.next/
+
+# Local-only placeholder videos (often exceed GitHub’s 100MB limit). Keep files on disk for dev; do not commit.
+public/placeholders/**/*.mp4
+public/placeholders/**/*.MP4

@@ -418,3 +418,48 @@ html {
     -webkit-mask-image: none;
   }
 }
+
+/* YouTube cover-mode (ReelSurface / YouTubeCover) — container-sized via --yt-cw/--yt-ch, no cqw/cqh */
+.yt-cover-root {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  --yt-cw: 100px;
+  --yt-ch: 100px;
+  --yt-cover-scale: 1;
+}
+.yt-cover-inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.yt-cover-inner.yt-cover--landscape .yt-cover-iframe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(var(--yt-cw), calc(var(--yt-ch) * 16 / 9));
+  height: max(var(--yt-ch), calc(var(--yt-cw) * 9 / 16));
+  border: 0;
+  transform: translate(-50%, -50%) scale(var(--yt-cover-scale, 1));
+  transform-origin: center center;
+}
+.yt-cover-inner.yt-cover--portrait .yt-cover-iframe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(var(--yt-cw), calc(var(--yt-ch) * 9 / 16));
+  height: max(var(--yt-ch), calc(var(--yt-cw) * 16 / 9));
+  border: 0;
+  transform: translate(-50%, -50%) scale(var(--yt-cover-scale, 1));
+  transform-origin: center center;
+}
+.yt-cover-inner.yt-cover--square .yt-cover-iframe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(var(--yt-cw), var(--yt-ch));
+  height: max(var(--yt-cw), var(--yt-ch));
+  border: 0;
+  transform: translate(-50%, -50%) scale(var(--yt-cover-scale, 1));
+  transform-origin: center center;
+}

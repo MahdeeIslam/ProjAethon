@@ -5,22 +5,19 @@ import Link from 'next/link'
 import { caseStudies } from '@/data/caseStudies'
 import { getMetrics, getPrimaryMetric, getSecondaryMetric } from '@/data/caseStudies'
 import { getReelForCaseStudy } from '@/lib/reels'
-import { shuffleArray } from '@/lib/shuffle'
+import { getReelShuffleSeed, shuffleDeterministic } from '@/lib/shuffle'
 import Reveal from '@/components/motion/Reveal'
 import RevealGroup from '@/components/motion/RevealGroup'
 import Container from '@/components/ui/Container'
 import { YT } from '@/data/videoUrls'
-import { isYouTubeUrl } from '@/lib/youtube'
-import YouTubeEmbed from '@/components/YouTubeEmbed'
+import { filterLandscapeReelUrls } from '@/lib/youtube'
+import { normalizeReelInput } from '@/lib/media/normalizeReel'
+import ReelSurface from '@/components/media/ReelSurface'
 
 const HERO_CASE_STUDY_ID = '1'
 const FALLBACK_HORIZONTAL = YT.horizontalReels[0] ?? 'https://www.youtube.com/watch?v=REPLACE_ME'
 
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
-
-function encodePath(p: string): string {
-  return p.split('/').map((s) => encodeURIComponent(s)).join('/')
-}
 
 export default function FeaturedCaseStudiesModule() {
   const [horizontalPaths, setHorizontalPaths] = useState<string[]>([])
@@ -35,29 +32,55 @@ export default function FeaturedCaseStudiesModule() {
       .then((res) => res.json())
       .then((data: { paths: string[] }) => {
         const paths = Array.isArray(data.paths) ? data.paths : []
-        setHorizontalPaths(paths.length > 0 ? paths : [FALLBACK_HORIZONTAL])
+        const merged = paths.length > 0 ? paths : [...YT.horizontalReels]
+        const filtered = filterLandscapeReelUrls(merged)
+        setHorizontalPaths(
+          filtered.length > 0 ? filtered : filterLandscapeReelUrls([...YT.horizontalReels])
+        )
       })
-      .catch(() => setHorizontalPaths([FALLBACK_HORIZONTAL]))
+      .catch(() => setHorizontalPaths(filterLandscapeReelUrls([...YT.horizontalReels])))
   }, [])
+
+  const basePool = useMemo(() => {
+    const merged = horizontalPaths.length > 0 ? horizontalPaths : [...YT.horizontalReels]
+    const filtered = filterLandscapeReelUrls(merged)
+    const base = filtered.length > 0 ? filtered : filterLandscapeReelUrls([...YT.horizontalReels])
+    return [...base].sort((a, b) => a.localeCompare(b))
+  }, [horizontalPaths])
+
+  const [shuffledPool, setShuffledPool] = useState<string[] | null>(null)
+  useEffect(() => {
+    setShuffledPool(shuffleDeterministic([...basePool], getReelShuffleSeed()))
+  }, [basePool])
+
+  const horizontalPool = shuffledPool ?? basePool
 
   const { hero, stackCards, miniCards } = useMemo(() => {
     const all = [...caseStudies]
-    const hero = all.find((c) => c.id === HERO_CASE_STUDY_ID) ?? all[0]
-    const rest = all.filter((c) => c.id !== hero.id)
+    const heroStudy = all.find((c) => c.id === HERO_CASE_STUDY_ID) ?? all[0]
+    const rest = all.filter((c) => c.id !== heroStudy.id)
     const stackCards = rest.slice(0, 2)
     const miniCards = rest.slice(2, 5)
-    return { hero, stackCards, miniCards }
+    return { hero: heroStudy, stackCards, miniCards }
   }, [])
 
-  const heroReel = useMemo(
-    () => getReelForCaseStudy(hero, horizontalPaths) ?? FALLBACK_HORIZONTAL,
-    [hero, horizontalPaths]
+  const heroReelUrl = useMemo(
+    () => getReelForCaseStudy(hero, horizontalPool) ?? horizontalPool[0] ?? FALLBACK_HORIZONTAL,
+    [hero, horizontalPool]
   )
 
+  const heroReel = useMemo(() => normalizeReelInput(heroReelUrl), [heroReelUrl])
+
   const stackReels = useMemo(() => {
-    const shuffled = shuffleArray([...horizontalPaths])
-    return [shuffled[0] ?? FALLBACK_HORIZONTAL, shuffled[1] ?? shuffled[0] ?? FALLBACK_HORIZONTAL]
-  }, [horizontalPaths])
+    const s = shuffleDeterministic([...horizontalPool], `${getReelShuffleSeed()}-stack`)
+    return [s[0] ?? heroReelUrl, s[1] ?? s[0] ?? heroReelUrl]
+  }, [horizontalPool, heroReelUrl])
+
+  const miniReels = useMemo(() => {
+    const s = shuffleDeterministic([...horizontalPool], `${getReelShuffleSeed()}-mini`)
+    const n = Math.max(s.length, 1)
+    return miniCards.map((_, i) => s[(i + 3) % n] ?? heroReelUrl)
+  }, [horizontalPool, miniCards, heroReelUrl])
 
   const heroMetrics = getMetrics(hero).slice(0, 3)
 
@@ -67,7 +90,6 @@ export default function FeaturedCaseStudiesModule() {
       aria-label="Featured case studies"
     >
       <Container wide>
-        {/* Header row */}
         <Reveal>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
             <div>
@@ -99,53 +121,32 @@ export default function FeaturedCaseStudiesModule() {
         </Reveal>
         <div className="mt-5 h-px w-full bg-[rgba(245,245,242,0.12)]" />
 
-        {/* Hero + stack grid */}
         <div className="mt-5 grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-12 lg:gap-5">
-          {/* Hero (7 cols) */}
           <Reveal className="lg:col-span-7">
             <Link
               href={`/case-studies/${hero.slug}`}
-              className="group/card block relative overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] shadow-none transition-[border-color,transform,box-shadow] duration-300 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
+              className="group/card relative block overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] shadow-none transition-[border-color,transform,box-shadow] duration-300 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
             >
               <span className="absolute right-6 top-6 z-10 text-xs font-medium text-bone/65">
                 01 / 06
               </span>
 
-              {/* Video layer */}
               <div className="absolute inset-0">
-                {!reduceMotion && (
-                  isYouTubeUrl(heroReel) ? (
-                    <YouTubeEmbed
-                      url={heroReel}
-                      title={`${hero.client} reel`}
-                      autoplay
-                      muted
-                      loop
-                      controls={false}
-                      className="absolute inset-0 h-full w-full opacity-75 transition-transform duration-700 ease-out group-hover/card:scale-[1.02] motion-reduce:transition-none"
-                    />
-                  ) : (
-                    <video
-                      src={encodePath(heroReel)}
-                      muted
-                      loop
-                      playsInline
-                      autoPlay
-                      preload="metadata"
-                      className="absolute inset-0 h-full w-full object-cover opacity-75 transition-transform duration-700 ease-out group-hover/card:scale-[1.02] motion-reduce:transition-none"
-                      style={{
-                        filter: 'saturate(0.8) contrast(0.9) brightness(0.9)',
-                      }}
-                    />
-                  )
-                )}
-                {/* Layer 1: global dark tint */}
+                <ReelSurface
+                  reel={heroReel}
+                  context="featured"
+                  title={`${hero.client} reel`}
+                  autoplay
+                  muted
+                  loop
+                  reduceMotion={reduceMotion}
+                  mediaClassName="opacity-75 transition-transform duration-700 ease-out group-hover/card:scale-[1.02] motion-reduce:transition-none"
+                />
                 <div
                   className="absolute inset-0"
                   style={{ background: 'rgba(0,0,0,0.55)' }}
                   aria-hidden
                 />
-                {/* Layer 2: left-to-right gradient */}
                 <div
                   className="absolute inset-0"
                   style={{
@@ -154,7 +155,6 @@ export default function FeaturedCaseStudiesModule() {
                   }}
                   aria-hidden
                 />
-                {/* Layer 3: bottom fade */}
                 <div
                   className="absolute inset-0"
                   style={{
@@ -163,9 +163,8 @@ export default function FeaturedCaseStudiesModule() {
                   }}
                   aria-hidden
                 />
-                {/* Noise */}
                 <div
-                  className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
+                  className="pointer-events-none absolute inset-0 opacity-[0.05] mix-blend-overlay"
                   style={{ backgroundImage: NOISE_SVG }}
                   aria-hidden
                 />
@@ -182,7 +181,6 @@ export default function FeaturedCaseStudiesModule() {
                   {hero.outcome}
                 </p>
 
-                {/* Stats - no dividers, baseline above */}
                 <div className="mt-5 border-t border-bone/[0.12] pt-5">
                   <div className="flex flex-col gap-5 sm:flex-row sm:gap-12">
                     {heroMetrics.map((m) => (
@@ -205,13 +203,13 @@ export default function FeaturedCaseStudiesModule() {
             </Link>
           </Reveal>
 
-          {/* Stack (5 cols) */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
             <RevealGroup stagger={0.06} duration={0.6} className="flex flex-col gap-4">
               {stackCards.map((study, i) => {
                 const primary = getPrimaryMetric(study)
                 const secondary = getSecondaryMetric(study)
                 const reelSrc = stackReels[i] ?? FALLBACK_HORIZONTAL
+                const reel = normalizeReelInput(reelSrc)
                 return (
                   <Link
                     key={study.id}
@@ -242,38 +240,24 @@ export default function FeaturedCaseStudiesModule() {
                         Read case study →
                       </span>
                     </div>
-                    {/* Reel strip - narrower, gradient blend */}
                     <div className="absolute right-0 top-0 bottom-0 w-11 border-l border-[rgba(245,245,242,0.10)] md:w-14">
-                      {!reduceMotion ? (
-                        isYouTubeUrl(reelSrc) ? (
-                          <YouTubeEmbed
-                            url={reelSrc}
-                            title={`${study.client} reel strip`}
-                            autoplay
-                            muted
-                            loop
-                            controls={false}
-                            className="absolute inset-0 h-full w-full opacity-55"
-                          />
-                        ) : (
-                          <video
-                            src={encodePath(reelSrc)}
-                            muted
-                            loop
-                            playsInline
-                            autoPlay
-                            preload="metadata"
-                            className="absolute inset-0 h-full w-full object-cover opacity-55"
-                            style={{
-                              filter: 'blur(10px) saturate(0.9) brightness(0.8)',
-                            }}
-                          />
-                        )
-                      ) : (
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a]" />
-                      )}
+                      <ReelSurface
+                        reel={reel}
+                        context="featured"
+                        title={`${study.client} reel strip`}
+                        autoplay
+                        muted
+                        loop
+                        reduceMotion={reduceMotion}
+                        mediaClassName="opacity-55"
+                        videoStyle={
+                          reel.source === 'mp4'
+                            ? { filter: 'blur(10px) saturate(0.9) brightness(0.8)' }
+                            : undefined
+                        }
+                      />
                       <div
-                        className="absolute inset-0"
+                        className="absolute inset-0 pointer-events-none"
                         style={{
                           background:
                             'linear-gradient(to left, rgba(26,26,26,0) 0%, rgba(26,26,26,0.65) 100%)',
@@ -288,30 +272,52 @@ export default function FeaturedCaseStudiesModule() {
           </div>
         </div>
 
-        {/* Mini row */}
         {miniCards.length > 0 && (
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <RevealGroup stagger={0.05} duration={0.6} className="col-span-full grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {miniCards.map((study) => {
+              {miniCards.map((study, i) => {
                 const primary = getPrimaryMetric(study)
+                const reelSrc = miniReels[i] ?? heroReelUrl
+                const reel = normalizeReelInput(reelSrc)
                 return (
                   <Link
                     key={study.id}
                     href={`/case-studies/${study.slug}`}
-                    className="group flex min-h-[160px] flex-col rounded-[18px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] p-5 transition-all duration-200 hover:border-[rgba(245,245,242,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
+                    className="group relative flex aspect-video w-full flex-col justify-end overflow-hidden rounded-[18px] border border-[rgba(245,245,242,0.12)] bg-black transition-all duration-200 hover:border-[rgba(245,245,242,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
                   >
-                    {primary && (
-                      <p className="text-xl font-bold text-bone/95 md:text-2xl">{primary.value}</p>
-                    )}
-                    {primary && (
-                      <p className="mt-0.5 text-xs text-bone/70">{primary.label}</p>
-                    )}
-                    <h3 className="mt-2.5 line-clamp-2 text-base font-bold tracking-tight text-bone">
-                      {study.title}
-                    </h3>
-                    <span className="mt-auto pt-4 border-b border-bone/20 pb-1 text-xs font-medium uppercase tracking-wider text-bone/80 transition-colors group-hover:border-bone w-fit">
-                      Read case study →
-                    </span>
+                    <div className="absolute inset-0">
+                      <ReelSurface
+                        reel={reel}
+                        context="grid"
+                        title={`${study.client} reel`}
+                        autoplay
+                        muted
+                        loop
+                        reduceMotion={reduceMotion}
+                        mediaClassName="opacity-90 transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none"
+                      />
+                      <div
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent"
+                        aria-hidden
+                      />
+                    </div>
+                    <div className="relative z-10 flex flex-col p-5">
+                      {primary && (
+                        <p className="text-xl font-bold text-bone md:text-2xl">{primary.value}</p>
+                      )}
+                      {primary && (
+                        <p className="mt-0.5 text-xs text-bone/70">{primary.label}</p>
+                      )}
+                      <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-bone/75">
+                        {study.client}
+                      </p>
+                      <h3 className="mt-1 line-clamp-2 text-base font-bold tracking-tight text-bone">
+                        {study.title}
+                      </h3>
+                      <span className="mt-3 border-b border-bone/25 pb-1 text-xs font-medium uppercase tracking-wider text-bone/85 transition-colors group-hover:border-bone w-fit">
+                        Read case study →
+                      </span>
+                    </div>
                   </Link>
                 )
               })}
@@ -319,7 +325,6 @@ export default function FeaturedCaseStudiesModule() {
           </div>
         )}
 
-        {/* Results snapshot - resolving row */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-8 md:gap-12 border-t border-[rgba(245,245,242,0.10)] py-6 min-h-[96px]">
           <div className="text-center">
             <p className="text-2xl font-bold text-bone md:text-3xl">40M+</p>

@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { shuffleArray } from '@/lib/shuffle'
+import { getReelShuffleSeed, shuffleDeterministic } from '@/lib/shuffle'
 import Container from '@/components/ui/Container'
 import Reveal from '@/components/motion/Reveal'
 import { YT } from '@/data/videoUrls'
-import { isYouTubeUrl } from '@/lib/youtube'
-import YouTubeEmbed from '@/components/YouTubeEmbed'
+import { normalizeReelInput } from '@/lib/media/normalizeReel'
+import ReelSurface from '@/components/media/ReelSurface'
 
 const FALLBACK_HORIZONTAL = [...YT.horizontalReels]
 
@@ -18,10 +18,6 @@ const LABELS = [
   { title: 'Moe.vis Client Work', category: 'Digital', year: '2024' },
   { title: 'Elder Event Recap', category: 'Institutional', year: '2024' },
 ]
-
-function encodePath(p: string): string {
-  return p.split('/').map((s) => encodeURIComponent(s)).join('/')
-}
 
 function ReelPlateCard({
   src,
@@ -37,17 +33,17 @@ function ReelPlateCard({
   const [videoFailed, setVideoFailed] = useState(false)
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
+  const reel = useMemo(() => normalizeReelInput(src), [src])
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
 
-  const encodedSrc = encodePath(src)
-  const useYouTube = isYouTubeUrl(src)
-  const showVideo = !reduceMotion && !videoFailed
   useEffect(() => {
-    if (useYouTube) setVideoLoaded(true)
-  }, [useYouTube])
+    if (reel.source === 'youtube') setVideoLoaded(true)
+  }, [reel.source])
+
+  const showVideo = !reduceMotion && !videoFailed
 
   return (
     <div className="relative shrink-0 w-[280px] sm:w-[340px] md:w-[440px] snap-center snap-always" data-rail-index={index}>
@@ -59,31 +55,19 @@ function ReelPlateCard({
           {String(index + 1).padStart(2, '0')}/{String(total).padStart(2, '0')}
         </span>
         {showVideo && (
-          useYouTube ? (
-            <YouTubeEmbed
-              url={src}
-              title={label.title}
-              autoplay
-              muted
-              loop
-              controls={false}
-              // Mark loaded on first paint; YouTube doesn't fire onLoadedData.
-              className={`absolute inset-0 h-full w-full transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-            />
-          ) : (
-            <video
-              src={encodedSrc}
-              muted
-              loop
-              playsInline
-              autoPlay
-              preload="metadata"
-              onError={() => setVideoFailed(true)}
-              onLoadedData={() => setVideoLoaded(true)}
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-              style={{ filter: 'saturate(1.06) contrast(1.03)' }}
-            />
-          )
+          <ReelSurface
+            reel={reel}
+            context="grid"
+            title={label.title}
+            autoplay
+            muted
+            loop
+            reduceMotion={false}
+            mediaClassName={`transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+            videoStyle={{ filter: 'saturate(1.06) contrast(1.03)' }}
+            onVideoError={() => setVideoFailed(true)}
+            onVideoReady={() => setVideoLoaded(true)}
+          />
         )}
         {(!showVideo || videoFailed) && (
           <div className="absolute inset-0 bg-gradient-to-br from-[#3a3a3a] to-[#1a1a1a] flex items-center justify-center">
@@ -113,12 +97,15 @@ export default function WorkInMotionRail() {
     fetch('/api/reels/horizontal')
       .then((res) => res.json())
       .then((data: { paths: string[] }) => {
-        const p = Array.isArray(data.paths) && data.paths.length > 0
-          ? data.paths
-          : FALLBACK_HORIZONTAL
-        setPaths(shuffleArray([...p]))
+        const raw =
+          Array.isArray(data.paths) && data.paths.length > 0 ? data.paths : FALLBACK_HORIZONTAL
+        const sorted = [...raw].sort((a, b) => a.localeCompare(b))
+        setPaths(shuffleDeterministic(sorted, `${getReelShuffleSeed()}-work-rail`))
       })
-      .catch(() => setPaths(FALLBACK_HORIZONTAL))
+      .catch(() => {
+        const sorted = [...FALLBACK_HORIZONTAL].sort((a, b) => a.localeCompare(b))
+        setPaths(shuffleDeterministic(sorted, `${getReelShuffleSeed()}-work-rail`))
+      })
   }, [])
 
   const displayPaths = useMemo(() => paths.slice(0, 10), [paths])
@@ -182,7 +169,7 @@ export default function WorkInMotionRail() {
         >
           {displayPaths.map((src, i) => (
             <ReelPlateCard
-              key={i}
+              key={`${src}-${i}`}
               src={src}
               index={i}
               total={total}
