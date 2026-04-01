@@ -121,11 +121,11 @@ export default function FeaturedCaseStudiesModule() {
         </Reveal>
         <div className="mt-5 h-px w-full bg-[rgba(245,245,242,0.12)]" />
 
-        <div className="mt-5 grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-12 lg:gap-5">
-          <Reveal className="lg:col-span-7">
+        <div className="mt-5 grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-12 lg:items-stretch lg:gap-5">
+          <Reveal className="flex min-h-0 lg:col-span-7 lg:h-full">
             <Link
               href={`/case-studies/${hero.slug}`}
-              className="group/card relative block overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] shadow-none transition-[border-color,transform,box-shadow] duration-300 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
+              className="group/card relative flex min-h-[380px] w-full flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] shadow-none transition-[border-color,transform,box-shadow] duration-300 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none lg:min-h-0 lg:h-full"
             >
               <span className="absolute right-6 top-6 z-10 text-xs font-medium text-bone/65">
                 01 / 06
@@ -170,7 +170,7 @@ export default function FeaturedCaseStudiesModule() {
                 />
               </div>
 
-              <div className="relative flex min-h-[380px] flex-col justify-end p-8 md:p-10">
+              <div className="relative z-10 flex flex-1 flex-col justify-end p-8 md:p-10">
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-bone/80">
                   {hero.client}
                 </p>
@@ -203,8 +203,8 @@ export default function FeaturedCaseStudiesModule() {
             </Link>
           </Reveal>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
-            <RevealGroup stagger={0.06} duration={0.6} className="flex flex-col gap-4">
+          <div className="grid min-h-0 grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:self-stretch">
+            <RevealGroup stagger={0.06} duration={0.6} className="flex h-full flex-col gap-4">
               {stackCards.map((study, i) => {
                 const primary = getPrimaryMetric(study)
                 const secondary = getSecondaryMetric(study)
