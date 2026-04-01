@@ -19,7 +19,7 @@ export default function BackToTop() {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-6 left-6 z-20 flex h-9 items-center gap-2 rounded-full border border-[var(--line)] bg-[rgba(26,26,26,0.6)] px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-bone/60 backdrop-blur-sm transition-all duration-200 hover:border-[var(--line2)] hover:text-bone focus:outline-none focus:ring-2 focus:ring-bone/20 focus:ring-offset-2 focus:ring-offset-obsidian"
+      className="fixed bottom-24 right-4 z-[60] flex h-9 items-center gap-2 rounded-full border border-[var(--line)] bg-[rgba(26,26,26,0.88)] px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-bone/70 shadow-lg backdrop-blur-md transition-all duration-200 hover:border-[var(--line2)] hover:text-bone focus:outline-none focus:ring-2 focus:ring-bone/20 focus:ring-offset-2 focus:ring-offset-obsidian md:bottom-8 md:right-6"
       aria-label="Back to top"
     >
       <ArrowUp size={12} />

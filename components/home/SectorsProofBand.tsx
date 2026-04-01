@@ -6,15 +6,15 @@ import Container from '@/components/ui/Container'
 export default function SectorsProofBand() {
   return (
     <section
-      className="bg-obsidian border-t border-[rgba(245,245,242,0.10)]"
+      className="relative z-10 bg-obsidian border-t border-[rgba(245,245,242,0.10)]"
       aria-label="Sectors we serve"
     >
-      <Container wide className="py-5 md:py-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-          <p className="shrink-0 text-sm font-semibold uppercase tracking-[0.2em] text-bone/70">
+      <Container wide className="py-6 md:py-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-10">
+          <p className="shrink-0 pt-0.5 text-sm font-semibold uppercase tracking-[0.2em] text-bone/70">
             Sectors we serve
           </p>
-          <div className="flex flex-wrap gap-2.5 max-w-3xl">
+          <div className="flex flex-wrap content-start gap-x-2.5 gap-y-3 max-w-3xl">
             {organisations.map((org) => (
               <span
                 key={org.id}

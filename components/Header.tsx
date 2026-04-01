@@ -33,8 +33,8 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[rgba(26,26,26,0.72)] backdrop-blur-[12px] border-b border-[var(--line)]'
-          : 'bg-transparent'
+          ? 'bg-[rgba(26,26,26,0.94)] backdrop-blur-[14px] border-b border-[var(--line)]'
+          : 'border-b border-transparent bg-gradient-to-b from-black/55 via-black/20 to-transparent backdrop-blur-[6px]'
       }`}
     >
       <nav className="h-14 md:h-16 flex items-center">

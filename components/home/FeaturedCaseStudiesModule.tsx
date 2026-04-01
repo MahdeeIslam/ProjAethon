@@ -103,25 +103,19 @@ export default function FeaturedCaseStudiesModule() {
                 Measured outcomes across distribution, growth, and revenue.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 md:justify-end">
               <Link
                 href="/case-studies"
-                className="relative inline-block text-sm font-medium uppercase tracking-wider text-bone/80 transition-colors hover:text-bone after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-bone/50 after:transition-[width] after:duration-200 hover:after:w-full"
+                className="relative inline-block text-sm font-medium uppercase tracking-wider text-bone/85 transition-colors hover:text-bone after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-bone/50 after:transition-[width] after:duration-200 hover:after:w-full"
               >
                 View all case studies →
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex h-12 items-center justify-center border border-[rgba(245,245,242,0.35)] px-6 text-sm font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:border-bone/50 hover:bg-[rgba(245,245,242,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/30 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
-              >
-                Request a Strategic Consultation
               </Link>
             </div>
           </div>
         </Reveal>
-        <div className="mt-5 h-px w-full bg-[rgba(245,245,242,0.12)]" />
+        <div className="mt-6 h-px w-full bg-[rgba(245,245,242,0.12)]" />
 
-        <div className="mt-5 grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-12 lg:items-stretch lg:gap-5">
+        <div className="mt-8 grid grid-cols-1 gap-4 md:gap-5 lg:grid-cols-12 lg:items-stretch lg:gap-5">
           <Reveal className="flex min-h-0 lg:col-span-7 lg:h-full">
             <Link
               href={`/case-studies/${hero.slug}`}
@@ -171,10 +165,10 @@ export default function FeaturedCaseStudiesModule() {
               </div>
 
               <div className="relative z-10 flex flex-1 flex-col justify-end p-8 md:p-10">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-bone/80">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-bone/80 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
                   {hero.client}
                 </p>
-                <h3 className="mt-2 text-[32px] font-bold leading-[1.05] tracking-tight text-bone md:text-[40px] line-clamp-2">
+                <h3 className="mt-2 text-[32px] font-bold leading-[1.05] tracking-tight text-bone md:text-[40px] line-clamp-2 [text-shadow:0_2px_24px_rgba(0,0,0,0.85),0_1px_3px_rgba(0,0,0,0.9)]">
                   {hero.title}
                 </h3>
                 <p className="mt-2 line-clamp-2 text-base text-bone/80">
@@ -216,7 +210,7 @@ export default function FeaturedCaseStudiesModule() {
                     href={`/case-studies/${study.slug}`}
                     className="group relative flex overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] transition-all duration-200 hover:border-[rgba(245,245,242,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
                   >
-                    <div className="flex min-h-[200px] flex-1 flex-col p-6 pr-[72px] md:pr-[80px]">
+                    <div className="flex min-h-[200px] flex-1 flex-col p-6 pb-7 pr-[100px] md:pr-[120px]">
                       <p className="text-xs font-semibold uppercase tracking-[0.15em] text-bone/65">
                         {study.client}
                       </p>
@@ -240,7 +234,7 @@ export default function FeaturedCaseStudiesModule() {
                         Read case study →
                       </span>
                     </div>
-                    <div className="absolute right-0 top-0 bottom-0 w-11 border-l border-[rgba(245,245,242,0.10)] md:w-14">
+                    <div className="absolute right-0 top-0 bottom-0 w-[88px] overflow-hidden border-l border-[rgba(245,245,242,0.10)] md:w-[104px]">
                       <ReelSurface
                         reel={reel}
                         context="featured"

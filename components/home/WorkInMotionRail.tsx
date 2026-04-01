@@ -140,17 +140,17 @@ export default function WorkInMotionRail() {
     >
       <Container wide>
         <Reveal>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
+          <div className="mb-8 flex flex-col gap-4 border-b border-bone/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-3xl font-bold uppercase tracking-tight text-bone md:text-4xl">
               Work in motion
             </h2>
-            <div className="flex items-center gap-4">
-              <span className="text-xs font-medium uppercase tracking-wider text-bone/60">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="text-xs font-medium tabular-nums uppercase tracking-wider text-bone/50">
                 {String(activeIndex + 1).padStart(2, '0')}/{String(total).padStart(2, '0')}
               </span>
               <Link
                 href="/portfolio"
-                className="text-sm font-medium uppercase tracking-wider text-bone/85 hover:text-bone border-b-2 border-transparent hover:border-bone/50 transition-colors"
+                className="text-sm font-medium uppercase tracking-wider text-bone/90 hover:text-bone border-b-2 border-transparent pb-0.5 hover:border-bone/45 transition-colors"
               >
                 View full portfolio →
               </Link>

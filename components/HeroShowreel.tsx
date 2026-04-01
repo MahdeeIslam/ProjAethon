@@ -162,7 +162,7 @@ export default function HeroShowreel() {
             <div className="max-w-[600px]">
               {/* Eyebrow */}
               <p
-                className="kicker text-bone text-xs uppercase tracking-[0.25em] mb-4 md:text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]"
+                className="kicker text-bone text-xs uppercase tracking-[0.2em] mb-4 md:text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] text-left"
                 style={{
                   opacity: show ? 1 : 0,
                   transform: show ? 'translateY(0)' : 'translateY(20px)',
@@ -211,7 +211,7 @@ export default function HeroShowreel() {
 
               {/* CTAs */}
               <div
-                className="mt-8 flex flex-col gap-3"
+                className="mt-10 flex flex-col gap-3 sm:mt-12"
                 style={{
                   opacity: show ? 1 : 0,
                   transform: show ? 'translateY(0)' : 'translateY(20px)',
@@ -298,11 +298,12 @@ export default function HeroShowreel() {
         </div>
       </div>
 
-      {/* 120px gradient transition into light section */}
+      {/* Transition into light section — softer blend to avoid a heavy band on stats */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[120px] pointer-events-none z-[3]"
+        className="absolute bottom-0 left-0 right-0 h-[100px] pointer-events-none z-[3] md:h-[110px]"
         style={{
-          background: 'linear-gradient(to bottom, var(--obsidian) 0%, #2d2b28 25%, #6b6964 60%, #ebe9e4 100%)',
+          background:
+            'linear-gradient(to bottom, transparent 0%, rgba(26,26,26,0.45) 35%, rgba(74,72,68,0.85) 72%, #d8d4cd 92%, #ebe9e4 100%)',
         }}
         aria-hidden
       />
