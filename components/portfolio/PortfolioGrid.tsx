@@ -22,8 +22,9 @@ export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps
     )
   }
 
+  /** Real grid (not CSS columns) — equal column widths, aligned rows, predictable order. */
   const gridClass =
-    'columns-1 gap-8 sm:columns-2 lg:columns-3 xl:columns-4 [&>*]:break-inside-avoid [&>*]:mb-8'
+    'grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 [&>div]:min-h-0 [&>div]:h-full'
 
   return (
     <section id="portfolio-grid" className="scroll-mt-24 pt-14 pb-24 md:pt-16 md:pb-28">

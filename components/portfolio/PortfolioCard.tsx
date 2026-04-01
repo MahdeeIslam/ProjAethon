@@ -61,11 +61,11 @@ export default function PortfolioCard({ item, onClick }: PortfolioCardProps) {
       tabIndex={0}
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
-      className="group relative overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] transition-all duration-300 hover:-translate-y-[2px] hover:border-[rgba(245,245,242,0.22)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)]"
+      className="group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] transition-all duration-300 hover:-translate-y-[2px] hover:border-[rgba(245,245,242,0.22)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)]"
     >
       <div
-        className={`relative overflow-hidden bg-obsidian ${
-          isHorizontal ? 'aspect-video' : 'aspect-[9/16] max-h-[720px]'
+        className={`relative w-full shrink-0 overflow-hidden bg-obsidian ${
+          isHorizontal ? 'aspect-video' : 'aspect-[9/16]'
         }`}
       >
         {/* Poster - always visible as base */}
@@ -126,7 +126,7 @@ export default function PortfolioCard({ item, onClick }: PortfolioCardProps) {
         />
       </div>
 
-      <div className="p-5 md:px-6 md:pb-6 md:pt-5">
+      <div className="flex flex-1 flex-col justify-end p-5 md:px-6 md:pb-6 md:pt-5">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-bone/75 line-clamp-1">
           {item.client}
         </p>
