@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { CONTACT_EMAIL } from '@/lib/brand'
 
 export default function PortfolioCTA() {
   return (
@@ -20,7 +21,7 @@ export default function PortfolioCTA() {
             Request a Strategic Consultation
           </Link>
           <a
-            href="mailto:hello@aethon.com"
+            href={`mailto:${CONTACT_EMAIL}`}
             className="text-sm font-medium uppercase tracking-wider text-bone/75 underline-offset-4 hover:text-bone hover:underline"
           >
             Email us →

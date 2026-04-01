@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PortfolioItem } from '@/data/portfolio'
 import { PILLAR_LABELS } from '@/data/portfolioMeta'
+import { CONTACT_EMAIL } from '@/lib/brand'
 import { getPosterForItem } from '@/lib/portfolioPoster'
 import { isYouTubeUrl } from '@/lib/youtube'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
@@ -194,7 +195,7 @@ export default function PortfolioModal({
               Request a Strategic Consultation
             </Link>
             <a
-              href="mailto:hello@aethon.com"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="text-center text-xs uppercase tracking-wider text-bone/70 underline-offset-4 hover:text-bone hover:underline"
             >
               Email us →

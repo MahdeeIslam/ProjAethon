@@ -35,6 +35,9 @@ export const SITE_URL =
 // Logo URL (absolute)
 export const LOGO_URL = `${SITE_URL}${LOGO_PATH}`
 
+/** Public contact email (mailto:, footer, CTAs) */
+export const CONTACT_EMAIL = 'aethon2026@gmail.com'
+
 // Primary CTA text (single source of truth)
 export const PRIMARY_CTA = 'Request a Strategic Consultation'
 /** Hero section primary CTA */

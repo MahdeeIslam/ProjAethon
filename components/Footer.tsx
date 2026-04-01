@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import Container from '@/components/ui/Container'
-import { BRAND_NAME, BRAND_TAGLINE } from '@/lib/brand'
+import { BRAND_NAME, BRAND_TAGLINE, CONTACT_EMAIL } from '@/lib/brand'
 
 export default function Footer() {
   return (
@@ -40,7 +40,11 @@ export default function Footer() {
               Connect
             </h4>
             <div className="space-y-2 text-sm text-bone/70">
-              <p><a href="mailto:hello@yourdomain.com" className="hover:text-bone transition-colors">hello@yourdomain.com</a></p>
+              <p>
+                <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-bone transition-colors">
+                  {CONTACT_EMAIL}
+                </a>
+              </p>
               <p><a href="tel:+1234567890" className="hover:text-bone transition-colors">+1 (234) 567-8900</a></p>
             </div>
           </div>

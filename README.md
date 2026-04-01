@@ -234,7 +234,8 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    - All URLs are automatically generated from this variable
 
 2. **Contact Information**:
-   - Update email and phone in:
+   - Set public email in `lib/brand.ts` (`CONTACT_EMAIL`; used by Footer, portfolio mailto links, etc.)
+   - Update phone in:
      - `components/Footer.tsx`
      - `app/contact/page.tsx`
 
@@ -349,7 +350,7 @@ Private - All rights reserved
 
 ## Support
 
-For questions or issues, contact: hello@yourdomain.com
+For questions or issues, contact: aethon2026@gmail.com (see `CONTACT_EMAIL` in `lib/brand.ts`)
 
 ---
 
