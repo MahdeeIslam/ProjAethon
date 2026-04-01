@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react'
 import { buildPortfolioItems, type PortfolioItem } from '@/data/portfolio'
 import { YT } from '@/data/videoUrls'
+
+function defaultPortfolioItems(): PortfolioItem[] {
+  return buildPortfolioItems([...YT.horizontalReels], [...YT.verticalReels])
+}
 import PortfolioHero from '@/components/portfolio/PortfolioHero'
 import FeaturedRail from '@/components/portfolio/FeaturedRail'
 import PortfolioGrid from '@/components/portfolio/PortfolioGrid'
@@ -11,7 +15,7 @@ import ResultsSnapshot from '@/components/portfolio/ResultsSnapshot'
 import PortfolioCTA from '@/components/portfolio/PortfolioCTA'
 
 export default function PortfolioPage() {
-  const [items, setItems] = useState<PortfolioItem[]>([])
+  const [items, setItems] = useState<PortfolioItem[]>(() => defaultPortfolioItems())
   const [modalItem, setModalItem] = useState<PortfolioItem | null>(null)
   const [modalIndex, setModalIndex] = useState(0)
 
@@ -56,14 +60,7 @@ export default function PortfolioPage() {
         }}
       />
 
-      <PortfolioGrid
-        items={items}
-        pillar={null}
-        format="all"
-        search=""
-        sort="newest"
-        onItemClick={openModal}
-      />
+      <PortfolioGrid items={items} onItemClick={openModal} />
 
       <ResultsSnapshot />
 
