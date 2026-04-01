@@ -32,25 +32,29 @@ export default function ProcessSection() {
             Our 4 step process
           </h2>
         </Reveal>
-        <RevealGroup stagger={0.06} duration={0.6} className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-6">
+        <RevealGroup
+          stagger={0.06}
+          duration={0.6}
+          className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:items-stretch md:gap-x-8 md:gap-y-6 [&>div]:min-h-0 [&>div]:h-full"
+        >
           {steps.map((step) => (
             <div
               key={step.num}
-              className="group relative overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] p-7 md:p-8 transition-all duration-200 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)] motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
+              className="group relative flex h-full min-h-[200px] flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] p-7 md:p-8 transition-all duration-200 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)] motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
             >
-              <div className="flex items-start justify-between">
-                <span className="text-sm font-medium tracking-[0.2em] text-bone/70">
+              <div className="flex shrink-0 items-start justify-between gap-4">
+                <span className="text-sm font-medium tabular-nums tracking-[0.2em] text-bone/70">
                   {step.num}
                 </span>
-                <span className="text-sm font-semibold uppercase tracking-[0.2em] text-bone/90">
+                <span className="text-right text-sm font-semibold uppercase tracking-[0.2em] text-bone/90">
                   {step.kicker}
                 </span>
               </div>
-              <p className="mt-5 text-base leading-relaxed text-bone/85 md:text-lg max-w-md">
+              <p className="mt-5 flex-1 text-balance text-base leading-relaxed text-bone/85 md:text-lg">
                 {step.line}
               </p>
               <div
-                className="absolute bottom-0 left-0 right-0 h-px bg-[rgba(245,245,242,0.12)] transition-colors duration-200 group-hover:bg-[rgba(245,245,242,0.35)]"
+                className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-[rgba(245,245,242,0.12)] transition-colors duration-200 group-hover:bg-[rgba(245,245,242,0.35)]"
                 aria-hidden
               />
             </div>
