@@ -1,8 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PortfolioItem } from '@/data/portfolio'
 import { getPosterForItem } from '@/lib/portfolioPoster'
+import { isYouTubeUrl } from '@/lib/youtube'
+import { normalizeReelInput } from '@/lib/media/normalizeReel'
+import ReelSurface from '@/components/media/ReelSurface'
 
 function encodePath(p: string): string {
   return p.split('/').map((s) => encodeURIComponent(s)).join('/')
@@ -44,7 +47,9 @@ function FeaturedPlate({ item, index, total }: FeaturedPlateProps) {
 
   const showVideo = !reduceMotion && !videoFailed && isInView
   const poster = getPosterForItem(item)
-  const src = encodePath(item.src)
+  const isYt = isYouTubeUrl(item.src)
+  const reel = useMemo(() => normalizeReelInput(item.src), [item.src])
+  const src = isYt ? item.src : encodePath(item.src)
   const tag = item.tags[0] ?? 'video'
   const metric = item.metrics?.[0]?.value
 
@@ -64,22 +69,36 @@ function FeaturedPlate({ item, index, total }: FeaturedPlateProps) {
             aria-hidden
           />
           {/* Video - plays when in view */}
-          {!videoFailed && (
-            <video
-              ref={videoRef}
-              src={src}
-              muted
-              loop
-              playsInline
-              autoPlay
-              preload="metadata"
-              poster={poster}
-              onError={() => setVideoFailed(true)}
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
-                showVideo ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          )}
+          {!videoFailed &&
+            (isYt ? (
+              <ReelSurface
+                reel={reel}
+                context="grid"
+                title={item.title}
+                autoplay
+                muted
+                loop
+                reduceMotion={reduceMotion}
+                mediaClassName={`transition-opacity duration-300 ${
+                  showVideo ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                src={src}
+                muted
+                loop
+                playsInline
+                autoPlay
+                preload="metadata"
+                poster={poster}
+                onError={() => setVideoFailed(true)}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+                  showVideo ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
           {videoFailed && (
             <div
               className="absolute inset-0 bg-cover bg-center"

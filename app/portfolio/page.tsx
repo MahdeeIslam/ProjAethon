@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { buildPortfolioItems, type PortfolioItem } from '@/data/portfolio'
+import { YT } from '@/data/videoUrls'
 import PortfolioHero from '@/components/portfolio/PortfolioHero'
 import FeaturedRail from '@/components/portfolio/FeaturedRail'
 import PortfolioGrid from '@/components/portfolio/PortfolioGrid'
@@ -16,14 +17,16 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/reels/horizontal').then((r) => r.json()),
-      fetch('/api/reels').then((r) => r.json()),
+      fetch('/api/reels/horizontal')
+        .then((r) => r.json())
+        .catch(() => ({ paths: [] as string[] })),
+      fetch('/api/reels')
+        .then((r) => r.json())
+        .catch(() => ({ paths: [] as string[] })),
     ]).then(([horiz, vert]) => {
-      const paths = buildPortfolioItems(
-        horiz.paths ?? [],
-        vert.paths ?? []
-      )
-      setItems(paths)
+      const h = Array.isArray(horiz.paths) && horiz.paths.length > 0 ? horiz.paths : [...YT.horizontalReels]
+      const v = Array.isArray(vert.paths) && vert.paths.length > 0 ? vert.paths : [...YT.verticalReels]
+      setItems(buildPortfolioItems(h, v))
     })
   }, [])
 

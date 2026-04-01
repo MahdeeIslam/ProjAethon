@@ -4,6 +4,8 @@
  * TODO: Replace placeholders with real project metadata.
  */
 
+import { extractYouTubeId } from '@/lib/youtube'
+
 export type Pillar = 'institutions' | 'narrative' | 'digital'
 
 export interface PortfolioItemMeta {
@@ -107,13 +109,43 @@ const META_BY_PATH: Record<string, Partial<PortfolioItemMeta>> = {
   },
 }
 
+/** When portfolio uses YouTube URLs (e.g. production without local MP4s). */
+const META_BY_YOUTUBE_ID: Record<string, Partial<PortfolioItemMeta>> = {
+  XK_wiMNxfCE: META_BY_PATH['Copy of Elders promo uncaptioned.mp4'],
+  uiZELAehGNM: META_BY_PATH['Copy of Third Space Teaser 1.mp4'],
+  KkKKx13q6Bc: META_BY_PATH['Copy of moe.vis client work.mp4'],
+  hkDefsMzmqY: META_BY_PATH['Copy of recap elder event ver 5.mp4'],
+  kTeN7EMQQeI: META_BY_PATH['Musibah.mp4'],
+  '5g3Tz_ZICps': META_BY_PATH['MVM DR Mustafa V2.mp4'],
+  Dcs18A4JFhc: META_BY_PATH['MVM GAZA UPDATEDv3.mp4'],
+  nTfIrIHp23I: META_BY_PATH['Ree#1 03.MP4'],
+  '22K2-0-fGMg': META_BY_PATH['Reel#3 02.MP4'],
+  nlPPQRuaABY: META_BY_PATH['TAOFIQ STORY V2.mp4'],
+}
+
 function getFilename(path: string): string {
   const parts = path.split('/')
   return parts[parts.length - 1] ?? path
 }
 
 export function getMetaForReel(path: string): PortfolioItemMeta {
-  const filename = getFilename(path)
+  const ytId = extractYouTubeId(path)
+  if (ytId) {
+    const override = META_BY_YOUTUBE_ID[ytId]
+    if (override) {
+      return {
+        client: override.client ?? 'Client',
+        title: override.title ?? ytId,
+        pillar: override.pillar ?? 'digital',
+        year: override.year ?? 2024,
+        tags: override.tags ?? ['video'],
+        description: override.description,
+        metrics: override.metrics,
+      }
+    }
+  }
+
+  const filename = getFilename(path).split('?')[0]
   const override = META_BY_PATH[filename]
 
   return {
