@@ -1,0 +1,12 @@
+# Placeholder Media Directory
+
+## Structure
+
+- `/plates/` - Abstract gallery plates (noise + gradients + thin lines)
+- `/posters/` - Poster images for videos
+- `hero-loop.mp4` - Silent hero video loop (TODO: Replace with actual cinematic loop)
+
+## TODO: Replace Placeholders
+
+- All placeholder media files should be replaced with actual client-supplied assets
+- See README.md for detailed replacement instructions

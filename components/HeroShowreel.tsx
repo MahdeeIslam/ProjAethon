@@ -9,9 +9,9 @@ import { HERO_TAGLINE, HERO_CTA, BRAND_WORDMARK } from '@/lib/brand'
 import { HERO_PHOTO } from '@/data/placeholderPhotos'
 import { YT } from '@/data/videoUrls'
 import { isYouTubeUrl } from '@/lib/youtube'
-import YouTubeEmbed from '@/components/YouTubeEmbed'
+import { normalizeReelInput } from '@/lib/media/normalizeReel'
+import ReelSurface from '@/components/media/ReelSurface'
 
-const HERO_VIDEO_SRC = YT.heroBackground
 const HERO_VIDEO_FALLBACK = YT.heroLoop
 const HERO_VIDEO_FALLBACK2 = YT.heroLoop
 const HERO_POSTER = HERO_PHOTO
@@ -29,7 +29,7 @@ const MOTION_DELAYS = { eyebrow: 0, headline: 150, subtext: 300, buttons: 450, m
 export default function HeroShowreel() {
   const [audioEnabled, setAudioEnabled] = useState(false)
   const [showPoster, setShowPoster] = useState(true)
-  const [videoSrc, setVideoSrc] = useState<string>(HERO_VIDEO_SRC)
+  const [videoSrc, setVideoSrc] = useState<string>(() => YT.heroBackground)
   const [mounted, setMounted] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
   const [parallaxY, setParallaxY] = useState(0)
@@ -39,6 +39,10 @@ export default function HeroShowreel() {
   useEffect(() => {
     if (videoRef.current) videoRef.current.muted = !audioEnabled
   }, [audioEnabled])
+
+  useEffect(() => {
+    setVideoSrc(YT.heroBackground)
+  }, [YT.heroBackground])
 
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -69,22 +73,21 @@ export default function HeroShowreel() {
   const onCanPlay = () => setShowPoster(false)
 
   const onVideoError = () => {
-    if (videoSrc === HERO_VIDEO_SRC) setVideoSrc(HERO_VIDEO_FALLBACK)
+    if (videoSrc === YT.heroBackground) setVideoSrc(HERO_VIDEO_FALLBACK)
     else if (videoSrc === HERO_VIDEO_FALLBACK) setVideoSrc(HERO_VIDEO_FALLBACK2)
   }
 
   const show = reduceMotion || mounted
   const useYouTube = isYouTubeUrl(videoSrc)
-
+  const heroReel = normalizeReelInput(videoSrc)
   useEffect(() => {
-    // YouTube embeds don't fire <video> events; remove the overlay immediately.
     if (useYouTube) setShowPoster(false)
   }, [useYouTube])
 
   return (
     <section
       ref={sectionRef}
-      className="relative flex min-h-[70vh] max-h-[720px] w-full flex-col overflow-hidden bg-[var(--obsidian)]"
+      className="group/hero relative flex min-h-[70vh] max-h-[720px] w-full flex-col overflow-hidden bg-[var(--obsidian)]"
       aria-label="Hero showreel"
     >
       {/* Layer 1: Background video */}
@@ -93,14 +96,17 @@ export default function HeroShowreel() {
         style={{ transform: `translateY(${parallaxY * 0.5}px)` }}
       >
         {useYouTube ? (
-          <YouTubeEmbed
-            url={videoSrc}
+          <ReelSurface
+            key={videoSrc}
+            reel={heroReel}
+            context="hero"
             title="Aethon hero background"
             autoplay
             muted={!audioEnabled}
             loop
-            controls={false}
-            className="absolute inset-0 h-full w-full"
+            showControls={false}
+            reduceMotion={false}
+            mediaClassName="opacity-[0.75] transition-transform duration-700 ease-out motion-reduce:transition-none group-hover/hero:scale-[1.02]"
           />
         ) : (
           <video

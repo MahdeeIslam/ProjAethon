@@ -30,6 +30,17 @@ export function isYouTubeUrl(url: string): boolean {
   return extractYouTubeId(url) !== null
 }
 
+/** Drop Shorts + hosted vertical reel paths so “horizontal” rails only use landscape sources. */
+export function filterLandscapeReelUrls(urls: readonly string[] | string[]): string[] {
+  return urls.filter((u) => {
+    const lower = u.toLowerCase()
+    if (lower.includes('/shorts/')) return false
+    if (lower.includes('youtube.com/shorts')) return false
+    if (u.includes('/Vertical/') || u.includes('/reels/Vertical/')) return false
+    return true
+  })
+}
+
 export function toYouTubeEmbedUrl(
   url: string,
   opts?: { autoplay?: boolean; muted?: boolean; loop?: boolean; controls?: boolean }

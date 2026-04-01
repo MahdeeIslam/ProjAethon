@@ -4,7 +4,7 @@
  */
 
 export const YT = {
-  heroBackground: 'https://youtube.com/shorts/pZjopRHhugc?feature=share',
+  heroBackground: 'https://youtu.be/uiZELAehGNM',
   heroLoop: 'https://youtu.be/XIVQ-LYGflw',
   horizontalReels: [
     'https://youtu.be/XK_wiMNxfCE', // Elder promo uncaptioned
