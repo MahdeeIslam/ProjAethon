@@ -49,12 +49,12 @@ export default function Header() {
             </span>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative py-3 px-2 text-[13px] font-medium tracking-[0.14em] uppercase transition-colors ${
+                className={`relative shrink-0 whitespace-nowrap py-3 px-1.5 text-[12px] font-medium tracking-[0.12em] uppercase transition-colors xl:px-2 xl:text-[13px] xl:tracking-[0.14em] ${
                   pathname === link.href ? 'text-bone' : 'text-bone/70 hover:text-bone'
                 }`}
               >

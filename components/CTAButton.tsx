@@ -12,7 +12,7 @@ interface CTAButtonProps {
 
 export default function CTAButton({ variant = 'primary', compact = false, className = '' }: CTAButtonProps) {
   const baseStyles = compact
-    ? 'inline-flex items-center justify-center h-10 px-5 text-[12px] font-semibold tracking-[0.12em] uppercase transition-all duration-200 border border-[var(--line2)] focus:outline-none focus:ring-2 focus:ring-bone/40 focus:ring-offset-2 focus:ring-offset-obsidian hover:-translate-y-0.5 hover:shadow-[var(--shadow)]'
+    ? 'inline-flex items-center justify-center h-10 shrink-0 whitespace-nowrap px-4 text-[11px] font-semibold tracking-[0.1em] uppercase transition-all duration-200 border border-[var(--line2)] focus:outline-none focus:ring-2 focus:ring-bone/40 focus:ring-offset-2 focus:ring-offset-obsidian hover:-translate-y-0.5 hover:shadow-[var(--shadow)] xl:px-5 xl:text-[12px] xl:tracking-[0.12em]'
     : 'inline-flex items-center justify-center h-10 px-6 text-[13px] font-semibold tracking-[0.12em] uppercase transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-bone/40 focus:ring-offset-2 focus:ring-offset-obsidian'
 
   const primaryStyles = 'bg-bone text-[#111] hover:bg-bone/95'
