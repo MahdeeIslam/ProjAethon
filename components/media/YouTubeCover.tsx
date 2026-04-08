@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { ReelAspect } from '@/data/reelMeta'
 import { toYouTubeEmbedUrl } from '@/lib/youtube'
 
@@ -39,6 +39,7 @@ export default function YouTubeCover({
   title?: string
 }) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   const embed = useMemo(
     () =>
@@ -47,9 +48,32 @@ export default function YouTubeCover({
         muted,
         loop,
         controls: showControls,
+        enableJsApi: true,
       }),
     [youtubeId, autoplay, muted, loop, showControls]
   )
+
+  const nudgeAutoplay = useCallback(() => {
+    const frame = iframeRef.current
+    if (!frame?.contentWindow) return
+    const post = (func: 'mute' | 'playVideo') => {
+      frame.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func, args: [] }),
+        '*'
+      )
+    }
+    // Send multiple nudges because some browsers delay player readiness.
+    post('mute')
+    post('playVideo')
+    window.setTimeout(() => {
+      post('mute')
+      post('playVideo')
+    }, 300)
+    window.setTimeout(() => {
+      post('mute')
+      post('playVideo')
+    }, 900)
+  }, [])
 
   useEffect(() => {
     const el = rootRef.current
@@ -73,11 +97,13 @@ export default function YouTubeCover({
     >
       <div className={`yt-cover-inner ${ASPECT_CLASS[aspect]}`}>
         <iframe
+          ref={iframeRef}
           className="yt-cover-iframe"
           src={embed}
           title={title}
           allow={IFRAME_ALLOW}
           referrerPolicy="strict-origin-when-cross-origin"
+          onLoad={nudgeAutoplay}
           allowFullScreen
         />
       </div>

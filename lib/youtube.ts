@@ -43,7 +43,13 @@ export function filterLandscapeReelUrls(urls: readonly string[] | string[]): str
 
 export function toYouTubeEmbedUrl(
   url: string,
-  opts?: { autoplay?: boolean; muted?: boolean; loop?: boolean; controls?: boolean }
+  opts?: {
+    autoplay?: boolean
+    muted?: boolean
+    loop?: boolean
+    controls?: boolean
+    enableJsApi?: boolean
+  }
 ): string | null {
   const id = extractYouTubeId(url)
   if (!id) return null
@@ -52,6 +58,7 @@ export function toYouTubeEmbedUrl(
   const muted = opts?.muted ? '1' : '0'
   const loop = opts?.loop ? '1' : '0'
   const controls = opts?.controls === false ? '0' : '1'
+  const enableJsApi = opts?.enableJsApi === false ? '0' : '1'
 
   // loop requires playlist=<id>
   const params = new URLSearchParams({
@@ -63,6 +70,7 @@ export function toYouTubeEmbedUrl(
     playsinline: '1',
     rel: '0',
     modestbranding: '1',
+    enablejsapi: enableJsApi,
   })
   if (loop !== '1') params.delete('playlist')
 
