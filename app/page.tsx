@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import HeroShowreel from '@/components/HeroShowreel'
 import VerticalReelsCarousel from '@/components/VerticalReelsCarousel'
 import SectorsProofBand from '@/components/home/SectorsProofBand'
-import WorkInMotionRail from '@/components/home/WorkInMotionRail'
 import FeaturedCaseStudiesModule from '@/components/home/FeaturedCaseStudiesModule'
 import ProcessSection from '@/components/home/ProcessSection'
 import ServicesSection from '@/components/home/ServicesSection'
@@ -25,19 +24,16 @@ export default function Home() {
       {/* 3. Sectors proof band */}
       <SectorsProofBand />
 
-      {/* 4. Work in motion rail (horizontal reels) */}
-      <WorkInMotionRail />
-
-      {/* 5. Featured case studies (hero card + grid + results snapshot) */}
+      {/* 4. Featured case studies (hero card + grid + results snapshot) */}
       <FeaturedCaseStudiesModule />
 
-      {/* 6. Our 4 step process + CTA */}
+      {/* 5. Our 4 step process + CTA */}
       <ProcessSection />
 
-      {/* 7. Services menu */}
+      {/* 6. Services menu */}
       <ServicesSection />
 
-      {/* 8. Contact us section */}
+      {/* 7. Contact us section */}
       <HomeContactSection />
 
       {/* Bottom header is in layout — reveals near bottom */}

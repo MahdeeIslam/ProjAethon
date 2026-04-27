@@ -222,7 +222,27 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    - Used for: OpenGraph URLs, sitemap, robots.txt, structured data
    - Fallback: `http://localhost:3000` (development)
 
-2. **Other variables** (optional):
+2. **Set media CDN base URL (recommended for production reels):**
+   ```bash
+   # Cloudflare R2 / public bucket base (no trailing slash)
+   MEDIA_BASE_URL=https://media.yourdomain.com
+   # optional client-exposed fallback if needed
+   NEXT_PUBLIC_MEDIA_BASE_URL=https://media.yourdomain.com
+   ```
+   - Used by: `/api/reels` and `/api/reels/horizontal`
+   - Expected files:
+     - `reels/Horizontal/Copy of Elders promo uncaptioned.mp4`
+     - `reels/Horizontal/Copy of Third Space Teaser 1.mp4`
+     - `reels/Horizontal/Copy of UMMA promo uncaptioned.mp4`
+     - `reels/Horizontal/Copy of moe.vis client work.mp4`
+     - `reels/Horizontal/Copy of recap elder event ver 5.mp4`
+     - `reels/Vertical/MVM DR Mustafa V2.mp4`
+     - `reels/Vertical/MVM GAZA UPDATEDv3.mp4`
+     - `reels/Vertical/Musibah.mp4`
+     - `reels/Vertical/TAOFIQ STORY V2.mp4`
+   - If not set, app falls back to local `/public/placeholders/...` reels in development.
+
+3. **Other variables** (optional):
    - Contact form email service keys
    - Analytics IDs
    - API keys

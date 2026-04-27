@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { caseStudies } from '@/data/caseStudies'
+import { getHorizontalPhoto } from '@/data/placeholderPhotos'
 import Reveal from '@/components/motion/Reveal'
 import RevealGroup from '@/components/motion/RevealGroup'
 
@@ -26,8 +27,14 @@ export default function CaseStudiesIndex() {
             <Link
               key={study.id}
               href={`/case-studies/${study.slug}`}
-              className="group block border border-bone/10 bg-bone/5 p-6 transition hover:border-bone/30 hover:bg-bone/10 md:p-8"
+              className="group block overflow-hidden border border-bone/10 bg-bone/5 transition hover:border-bone/30 hover:bg-bone/10"
             >
+              <div
+                className="aspect-[16/9] w-full border-b border-bone/10 bg-cover bg-center"
+                style={{ backgroundImage: `url(${getHorizontalPhoto(Number(study.id) % 4)})` }}
+                aria-hidden
+              />
+              <div className="p-6 md:p-8">
               <p className="text-xs uppercase tracking-wider text-bone/60">{study.client}</p>
               <h2 className="mt-2 text-xl font-bold tracking-tight text-bone md:text-2xl group-hover:opacity-90">
                 {study.title}
@@ -38,6 +45,7 @@ export default function CaseStudiesIndex() {
               <span className="mt-4 inline-block border-b border-bone/40 pb-1 text-sm font-medium text-bone/90 group-hover:border-bone">
                 Read Case Study →
               </span>
+              </div>
             </Link>
           ))}
         </RevealGroup>

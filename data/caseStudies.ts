@@ -45,31 +45,6 @@ export function getSecondaryMetric(study: CaseStudy): { value: string; label: st
 export const caseStudies: CaseStudy[] = [
   {
     id: '1',
-    slug: 'fairdinkum-podcast-25-million-views',
-    title: 'From Ground Zero to 25 Million Views',
-    client: 'FairDinkum Podcast',
-    atAGlance: [
-      { label: 'Total Views Generated', value: '25.47M' },
-      { label: 'Total Followers Gained', value: '83.7K' },
-      { label: 'Episodes Recorded', value: '250+' },
-      { label: 'Platforms', value: 'YouTube, Instagram, TikTok' },
-    ],
-    problem: 'A podcast with strong content but no visual system or distribution strategy. Starting from zero audience and no established presence across platforms.',
-    solution: [
-      'Built a full visual system and content pipeline aligned with the show’s voice.',
-      'Designed thumbnails, formats, and cutdowns for YouTube, Instagram, and TikTok.',
-      'Implemented distribution and growth strategy to scale reach and followers.',
-    ],
-    outcome: 'From ground zero to 25.47M views and 83.7K followers, with 250+ episodes produced and a multi-platform presence that drives ongoing growth.',
-    assets: [
-      { type: 'video', url: YT.caseStudyReels.reel01, caption: 'Showreel' },
-      { type: 'image', url: getHorizontalPhoto(0), caption: 'Campaign' },
-      { type: 'image', url: getHorizontalPhoto(1), caption: 'Social' },
-    ],
-    relatedIds: ['2', '5', '3'],
-  },
-  {
-    id: '2',
     slug: 'muslim-votes-matter-national-movement',
     title: 'Mobilizing a National Movement',
     client: 'Muslim Votes Matter',
@@ -89,11 +64,12 @@ export const caseStudies: CaseStudy[] = [
     assets: [
       { type: 'video', url: YT.caseStudyReels.reel02, caption: 'Campaign' },
       { type: 'image', url: getHorizontalPhoto(2), caption: 'Assets' },
+      { type: 'image', url: getHorizontalPhoto(3), caption: 'Distribution' },
     ],
-    relatedIds: ['1', '4', '6'],
+    relatedIds: ['2', '3'],
   },
   {
-    id: '3',
+    id: '2',
     slug: 'virgin-mary-mosque-250k-4-weeks',
     title: '$250k in 4 Weeks with Zero Ad Spend',
     client: 'Virgin Mary Mosque',
@@ -112,15 +88,16 @@ export const caseStudies: CaseStudy[] = [
     outcome: '$250K raised in 4 weeks, 7,000%+ estimated ROI, $0 ad spend, and a perpetual revenue stream secured.',
     assets: [
       { type: 'video', url: YT.caseStudyReels.reel03, caption: 'Campaign film' },
-      { type: 'image', url: getHorizontalPhoto(3), caption: 'Campaign' },
+      { type: 'image', url: getHorizontalPhoto(0), caption: 'Campaign' },
+      { type: 'image', url: getHorizontalPhoto(1), caption: 'Donations' },
     ],
-    relatedIds: ['4', '1', '2'],
+    relatedIds: ['1', '3'],
   },
   {
-    id: '4',
+    id: '3',
     slug: 'arabic-revival-360-event-funnel',
-    title: '400% Growth via "Event-to-Funnel" Media',
-    client: 'Arabic Revival 360 (Arabic Discovery Tour 2.0)',
+    title: '400% Growth via Event-to-Funnel Media',
+    client: 'Arabic Revival 360',
     atAGlance: [
       { label: 'Increase in Student Enrolments', value: '400%' },
       { label: 'Views Generated', value: '200,000+' },
@@ -136,66 +113,10 @@ export const caseStudies: CaseStudy[] = [
     outcome: '400% increase in student enrolments, 200K+ views, $15K+ revenue, and a repeatable event-to-funnel model.',
     assets: [
       { type: 'video', url: YT.caseStudyReels.reel04, caption: 'Event coverage' },
-      { type: 'image', url: getHorizontalPhoto(0), caption: 'Event' },
-      { type: 'image', url: getHorizontalPhoto(1), caption: 'Social' },
+      { type: 'image', url: getHorizontalPhoto(2), caption: 'Event' },
+      { type: 'image', url: getHorizontalPhoto(3), caption: 'Social' },
     ],
-    relatedIds: ['2', '5', '6'],
-  },
-  {
-    id: '5',
-    slug: 'onedeen-global-storytelling-platform',
-    title: 'Creating a global storytelling platform reaching millions worldwide',
-    client: 'OneDeen',
-    atAGlance: [
-      { label: 'Total Views Generated', value: '14M' },
-      { label: 'Total Followers Gained', value: '108,000+' },
-      { label: 'Clips Recorded', value: '180+' },
-      { label: 'Platforms', value: 'Instagram, TikTok' },
-      { label: 'Content Category', value: 'Islamic Media, Digital Dawah, Short-Form storytelling' },
-    ],
-    problem: 'A mission to reach millions with Islamic media and dawah, but no scalable content system or distribution strategy.',
-    solution: [
-      'Built a global storytelling platform with a consistent visual and narrative system.',
-      'Produced 180+ short-form clips optimized for Instagram and TikTok.',
-      'Implemented distribution and growth strategy to scale followers and views.',
-    ],
-    outcome: '14M total views, 108K+ followers, 180+ clips, and a global short-form storytelling platform in Islamic media and digital dawah.',
-    assets: [
-      { type: 'video', url: YT.caseStudyReels.reel05, caption: 'Short-form' },
-      { type: 'image', url: getHorizontalPhoto(2), caption: 'Platform' },
-    ],
-    relatedIds: ['1', '4', '6'],
-  },
-  {
-    id: '6',
-    slug: 'al-haramain-travels-umrah-brand',
-    title: 'Scaling Al-Haramain Travels into a High Demand Umrah Brand',
-    client: 'Al-Haramain Travels',
-    atAGlance: [
-      { label: 'Total Views Generated', value: '1.1M' },
-      { label: 'Revenue Gained', value: '$200,000+' },
-      { label: 'Clips Recorded', value: '25+' },
-      { label: 'Platforms', value: 'Instagram, TikTok' },
-      { label: 'Category', value: 'Muslim Travel Company, Umrah & Hajj specialist' },
-    ],
-    problem: 'A travel brand with a niche offer that needed to stand out and convert in a crowded space.',
-    solution: [
-      'Positioned Al-Haramain Travels as a high-demand Umrah and Hajj specialist through clear brand storytelling.',
-      'Produced 25+ clips and assets tailored for Instagram and TikTok.',
-      'Aligned content and funnels with search and social behaviour to drive bookings.',
-    ],
-    outcome: '1.1M views, $200K+ revenue, 25+ clips, and a recognizable, high-demand Umrah brand.',
-    keyOutcomes: [
-      'Strong brand recognition in the Muslim travel space.',
-      'Scalable content system for ongoing campaigns.',
-      'Measurable revenue tied to content and distribution.',
-    ],
-    assets: [
-      { type: 'video', url: YT.caseStudyReels.reel06, caption: 'Brand' },
-      { type: 'image', url: getHorizontalPhoto(3), caption: 'Campaign' },
-      { type: 'image', url: getHorizontalPhoto(0), caption: 'Social' },
-    ],
-    relatedIds: ['4', '5', '3'],
+    relatedIds: ['1', '2'],
   },
 ]
 

@@ -54,6 +54,7 @@ export default function FeaturedCaseStudiesModule() {
   }, [basePool])
 
   const horizontalPool = shuffledPool ?? basePool
+  const totalStudies = caseStudies.length
 
   const { hero, stackCards, miniCards } = useMemo(() => {
     const all = [...caseStudies]
@@ -122,7 +123,7 @@ export default function FeaturedCaseStudiesModule() {
               className="group/card relative flex min-h-[380px] w-full flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] shadow-none transition-[border-color,transform,box-shadow] duration-300 hover:border-[rgba(245,245,242,0.22)] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none lg:min-h-0 lg:h-full"
             >
               <span className="absolute right-6 top-6 z-10 text-xs font-medium text-bone/65">
-                01 / 06
+                01 / {String(totalStudies).padStart(2, '0')}
               </span>
 
               <div className="absolute inset-0">

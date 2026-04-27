@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { team } from '@/data/team'
-import { organisations } from '@/data/organisations'
 import { getHorizontalPhoto } from '@/data/placeholderPhotos'
+import HomeOrgMarquee from '@/components/HomeOrgMarquee'
 import Container from '@/components/ui/Container'
 import Section from '@/components/layout/Section'
 import Reveal from '@/components/motion/Reveal'
@@ -182,41 +182,19 @@ export default function AboutPage() {
       {/* ——— ORGANISATIONS: credibility wall ——— */}
       <Section className="!pt-24 !pb-24 md:!pt-[96px] md:!pb-[96px]">
         <div className={`mx-auto w-full ${CONTAINER_MAX} px-6 md:px-10`}>
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[auto_1fr] lg:gap-16">
-            <Reveal>
-              <div>
-                <h2 className="mb-3 text-2xl font-bold uppercase tracking-tight text-bone md:text-3xl">
-                  Organisations we&apos;ve worked with
-                </h2>
-                <p className="max-w-[50ch] text-base leading-relaxed text-bone/90">
-                  Institutions and community organisations across education, public trust, and media.
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={0.05}>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {organisations.map((org) => (
-                  <div
-                    key={org.id}
-                    className="flex min-h-[64px] items-center justify-center rounded-xl border border-bone/10 bg-bone/[0.02] px-4 py-3.5 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-bone/15 hover:bg-bone/[0.04]"
-                  >
-                    <span className="text-sm font-medium uppercase tracking-wider text-bone/88">
-                      {org.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
           <Reveal>
-            <p className="mt-8 text-sm text-bone/70">
-              Full client list available on request.
+            <h2 className="mb-3 text-2xl font-bold uppercase tracking-tight text-bone md:text-3xl">
+              Organisations we&apos;ve worked with
+            </h2>
+            <p className="mb-8 max-w-[50ch] text-base leading-relaxed text-bone/90">
+              Institutions and community organisations across education, public trust, and media.
             </p>
           </Reveal>
         </div>
+        <HomeOrgMarquee />
       </Section>
 
-      {/* ——— TEAM: main three (Saad, Nazif, Barisa) ——— */}
+      {/* ——— TEAM: main three leadership profiles ——— */}
       <Section className="!pt-24 !pb-24 md:!pt-[96px] md:!pb-[96px]">
         <div className={`mx-auto w-full ${CONTAINER_MAX} px-6 md:px-10`}>
           <Reveal>

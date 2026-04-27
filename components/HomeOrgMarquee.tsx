@@ -24,11 +24,11 @@ export default function HomeOrgMarquee() {
   return (
     <section
       className="border-t border-[var(--line)] bg-obsidian py-6 md:py-8"
-      aria-label="Sectors we serve"
+      aria-label="Organisations we've worked with"
     >
       <Container>
         <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-bone/40">
-          Sectors we serve
+          Organisations we&apos;ve worked with
         </p>
         <div className="overflow-hidden">
           <div

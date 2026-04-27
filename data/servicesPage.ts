@@ -44,9 +44,9 @@ export const SERVICES: ServiceSectionData[] = [
   {
     id: 'media-production',
     title: 'Media Production',
-    summary: 'End-to-end video, photography, design, and post-production. From concept to delivery, we build flagship assets and platform-optimised cutdowns that compound.',
+    summary: 'End-to-end video, photography, design, and post-production. We build flagship assets plus platform cutdowns that keep working after launch.',
     bestFor: ['Brand campaigns and product launches', 'Documentary and narrative storytelling', 'Event and campaign coverage'],
-    deliverables: 'Brand films, campaign films, cutdowns, photography sets, visual systems, graded masters and platform deliverables.',
+    deliverables: 'Brand films, campaign films, cutdowns, photography, visual systems, and final platform deliverables.',
     capabilities: [
       { title: 'Creative Direction', description: 'Concept, treatment, and creative leadership.', tag: 'Pre-production' },
       { title: 'Script & Storyboard', description: 'Narrative structure and shot planning.', tag: 'Pre-production' },
@@ -78,9 +78,9 @@ export const SERVICES: ServiceSectionData[] = [
   {
     id: 'social-media',
     title: 'Social Media Strategy & Growth',
-    summary: 'Paid and organic strategy, creative testing, and optimisation. We turn content into a growth system with clear funnels and measurable outcomes.',
+    summary: 'Paid and organic strategy, testing, and optimisation. We turn content into a clear growth system.',
     bestFor: ['Scaling reach and followers', 'Launching or relaunching channels', 'Driving conversions from social'],
-    deliverables: 'Strategy doc, content calendar, paid plans, creative tests, reporting dashboards, and ongoing optimisation.',
+    deliverables: 'Strategy, content calendar, paid plans, creative tests, and reporting.',
     capabilities: [
       { title: 'Paid Strategy & Media Planning', description: 'Budget, audience, and placement strategy.', tag: 'Strategy' },
       { title: 'Distribution Strategy', description: 'Organic and paid channel mix.', tag: 'Strategy' },
@@ -105,7 +105,7 @@ export const SERVICES: ServiceSectionData[] = [
   {
     id: 'digital-platforms',
     title: 'Digital Platforms, Search & Systems',
-    summary: 'Media-first websites, conversion landing pages, SEO, and analytics. We build the systems that make your content findable and measurable.',
+    summary: 'Media-first websites, landing pages, SEO, and analytics so your content is findable and measurable.',
     bestFor: ['New or refreshed web presence', 'Campaign landing and conversion', 'SEO and search visibility'],
     deliverables: 'Websites, landing pages, SEO strategy, tracking setup, and reporting.',
     capabilities: [
@@ -124,9 +124,9 @@ export const SERVICES: ServiceSectionData[] = [
   {
     id: 'brand-narrative',
     title: 'Brand & Narrative',
-    summary: 'Positioning, messaging, and visual identity. The foundation layer that makes everything else coherent and memorable.',
+    summary: 'Positioning, messaging, and visual identity so every output feels coherent and memorable.',
     bestFor: ['New brands or rebrands', 'Campaigns that need a clear story', 'Teams that need a content framework'],
-    deliverables: 'Messaging doc, brand system, style guides, campaign concepts, and creative direction.',
+    deliverables: 'Messaging, brand system, style guides, campaign concepts, and creative direction.',
     capabilities: [
       { title: 'Brand Positioning & Messaging', description: 'How you show up and what you say.', tag: 'Foundation' },
       { title: 'Visual Identity Systems', description: 'Logo, palette, typography, and usage.', tag: 'Foundation' },
@@ -170,12 +170,12 @@ export const ENGAGEMENT_OPTIONS = [
 ]
 
 export const FAQ_ITEMS = [
-  { q: 'What\'s the minimum engagement?', a: 'It depends on the service. Project-based work can start with a single film or campaign. Retainers and monthly systems typically run for at least 3 months so we can build and optimise.' },
-  { q: 'Do you handle distribution or only production?', a: 'Both. We design distribution strategy (organic and paid), set up tracking, and can manage publishing and optimisation. Production and distribution are built as one system.' },
-  { q: 'Do you work with teams or solo founders?', a: 'Both. We work with organisations of all sizes — from solo founders to larger teams. The engagement is tailored to your capacity and goals.' },
-  { q: 'How do you measure performance?', a: 'We define success metrics up front (views, reach, conversions, revenue, etc.) and use analytics and tracking to report on them. You get clear reporting and recommendations.' },
-  { q: 'Can we start with one shoot and scale?', a: 'Yes. Many clients start with a single project (e.g. a brand film or campaign) and then expand into ongoing production, social, or web once they see the impact.' },
-  { q: 'Do you do retainers?', a: 'Yes. We offer monthly and retainer-based engagements for ongoing strategy, production, and optimisation. Typically a minimum of 3 months for systems work.' },
+  { q: 'What\'s the minimum engagement?', a: 'Project work can start with one film or campaign. Monthly systems usually run for at least 3 months.' },
+  { q: 'Do you handle distribution or only production?', a: 'Both. We build production and distribution as one system.' },
+  { q: 'Do you work with teams or solo founders?', a: 'Both. We tailor the scope to your goals and capacity.' },
+  { q: 'How do you measure performance?', a: 'We set success metrics first, then report clearly on results and next actions.' },
+  { q: 'Can we start with one shoot and scale?', a: 'Yes. Many clients begin with one project and scale once the system is proven.' },
+  { q: 'Do you do retainers?', a: 'Yes. We offer monthly retainers for ongoing strategy, production, and optimisation.' },
 ]
 
 export const PRINCIPLE_TITLE = 'Visual media is leverage.'

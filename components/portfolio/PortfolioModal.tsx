@@ -1,12 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PortfolioItem } from '@/data/portfolio'
-import { PILLAR_LABELS } from '@/data/portfolioMeta'
-import { CONTACT_EMAIL } from '@/lib/brand'
 import { getPosterForItem } from '@/lib/portfolioPoster'
 import { isYouTubeUrl } from '@/lib/youtube'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
@@ -98,7 +95,7 @@ export default function PortfolioModal({
           animate={{ opacity: 1, y: 0 }}
           exit={prefersReduced ? undefined : { opacity: 0, y: 12 }}
           transition={{ duration: prefersReduced ? 0 : 0.25, ease: [0.4, 0, 0.2, 1] }}
-          className="relative flex h-full w-full max-w-7xl flex-col overflow-hidden p-4 md:flex-row md:p-6"
+          className="relative flex h-full w-full max-w-7xl flex-col overflow-hidden p-4 md:p-6"
           onClick={(e) => e.stopPropagation()}
         >
         {/* Close */}
@@ -145,67 +142,18 @@ export default function PortfolioModal({
           </div>
         </div>
 
-        {/* Right: Details */}
-        <div className="mt-6 flex w-full shrink-0 flex-col border-t border-bone/10 pt-6 md:mt-0 md:ml-8 md:w-80 md:border-t-0 md:border-l md:pl-8 md:pt-0">
+        <div className="mt-4 px-1 md:px-0">
           <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-bone/70">
-            {item.client}
+            {item.client} · {item.year}
           </p>
-          <h2 id="portfolio-modal-title" className="mt-1 text-xl font-bold tracking-tight text-bone md:text-2xl">
+          <h2 id="portfolio-modal-title" className="mt-1 text-lg font-bold tracking-tight text-bone md:text-xl">
             {item.title}
           </h2>
-          <p className="mt-2 text-xs uppercase tracking-wider text-bone/60">
-            {PILLAR_LABELS[item.pillar]} · {item.year}
-          </p>
-
-          {item.tags.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {item.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded border border-bone/20 px-2 py-0.5 text-xs text-bone/80"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {item.metrics && item.metrics.length > 0 && (
-            <div className="mt-4 space-y-2 border-t border-bone/10 pt-4">
-              {item.metrics.map((m) => (
-                <div key={m.label} className="flex justify-between text-sm">
-                  <span className="text-bone/70">{m.label}</span>
-                  <span className="font-medium text-bone">{m.value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {item.description && (
-            <p className="mt-4 text-sm leading-relaxed text-bone/80">
-              {item.description}
-            </p>
-          )}
-
-          <div className="mt-6 flex flex-col gap-3">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-lg border border-bone/20 bg-bone/5 px-5 py-2.5 text-sm font-medium uppercase tracking-wider text-bone transition hover:border-bone/40 hover:bg-bone/10"
-            >
-              Request a Strategic Consultation
-            </Link>
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="text-center text-xs uppercase tracking-wider text-bone/70 underline-offset-4 hover:text-bone hover:underline"
-            >
-              Email us →
-            </a>
-          </div>
         </div>
 
         {/* Bottom: Next/Prev - visible, subtle */}
         {allItems.length > 1 && (
-          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between md:left-1/2 md:right-auto md:bottom-6 md:w-64 md:-translate-x-1/2">
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-lg border border-bone/15 bg-black/35 px-2 py-2 backdrop-blur-sm md:bottom-6 md:left-1/2 md:right-auto md:w-[360px] md:-translate-x-1/2">
             <button
               onClick={(e) => {
                 e.stopPropagation()
@@ -215,9 +163,9 @@ export default function PortfolioModal({
               aria-label="Previous project"
             >
               <ChevronLeft size={18} />
-              <span className="hidden sm:inline">Previous</span>
+              <span className="hidden sm:inline">Previous project</span>
             </button>
-            <span className="text-xs text-bone/50">
+            <span className="text-xs font-medium text-bone/60">
               {currentIndex + 1} / {allItems.length}
             </span>
             <button

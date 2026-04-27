@@ -23,32 +23,29 @@ interface ReelTile {
   title: string
   category: string
   year: string
-  variant: 'featured' | 'secondary' | 'grid'
 }
 
 function ReelTileCard({ tile }: { tile: ReelTile }) {
   const [videoFailed, setVideoFailed] = useState(false)
   const [videoLoaded, setVideoLoaded] = useState(false)
+  const [reduceMotion, setReduceMotion] = useState(false)
   const reel = useMemo(() => normalizeReelInput(tile.src), [tile.src])
 
   useEffect(() => {
     if (reel.source === 'youtube') setVideoLoaded(true)
   }, [reel.source])
 
-  const heightClass =
-    tile.variant === 'featured'
-      ? 'h-[320px] md:h-[420px]'
-      : tile.variant === 'secondary'
-        ? 'h-[160px] md:h-[204px]'
-        : 'h-[200px] md:h-[240px]'
+  useEffect(() => {
+    setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  }, [])
 
   return (
     <Link
       href="/portfolio"
-      className={`group relative block overflow-hidden rounded-[20px] border-2 border-black/10 bg-white shadow-md transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 focus:ring-offset-[#f5f4f0] ${heightClass}`}
+      className="group relative block h-[260px] w-[220px] shrink-0 overflow-hidden rounded-[20px] border-2 border-black/10 bg-white shadow-md transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 focus:ring-offset-[#f5f4f0] sm:h-[320px] sm:w-[260px] md:h-[360px] md:w-[290px]"
     >
       <div className="absolute inset-0 bg-[#252525]">
-        {!videoFailed && (
+        {!videoFailed && !reduceMotion && (
           <ReelSurface
             reel={reel}
             context="grid"
@@ -63,7 +60,7 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
             onVideoReady={() => setVideoLoaded(true)}
           />
         )}
-        {videoFailed && (
+        {(videoFailed || reduceMotion) && (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#3a3a3a] to-[#1a1a1a]">
             <span className="text-xs font-medium uppercase tracking-wider text-bone/40">Preview</span>
           </div>
@@ -89,8 +86,10 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
 
 export default function VerticalReelsCarousel() {
   const [reelPaths, setReelPaths] = useState<string[]>([])
+  const [reduceMotion, setReduceMotion] = useState(false)
 
   useEffect(() => {
+    setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
     fetch('/api/reels')
       .then((res) => res.json())
       .then((data: { paths: string[] }) => {
@@ -114,19 +113,20 @@ export default function VerticalReelsCarousel() {
   const paths = shuffledPool ?? basePool
 
   const tiles = useMemo((): ReelTile[] => {
-    const titles = ['FairDinkum Podcast', 'Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series']
-    const categories = ['Institutional', 'Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital']
-    const years = ['2024', '2024', '2024', '2023', '2024', '2023']
+    const titles = ['Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series']
+    const categories = ['Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital']
+    const years = ['2024', '2024', '2023', '2024', '2023']
 
     return [
-      { src: paths[0] ?? FALLBACK_REEL_PATHS[0], title: titles[0], category: categories[0], year: years[0], variant: 'featured' },
-      { src: paths[1] ?? paths[0] ?? FALLBACK_REEL_PATHS[1], title: titles[1], category: categories[1], year: years[1], variant: 'secondary' },
-      { src: paths[2] ?? paths[0] ?? FALLBACK_REEL_PATHS[2], title: titles[2], category: categories[2], year: years[2], variant: 'secondary' },
-      { src: paths[3] ?? paths[0] ?? FALLBACK_REEL_PATHS[3], title: titles[3], category: categories[3], year: years[3], variant: 'grid' },
-      { src: paths[4] ?? paths[0] ?? FALLBACK_REEL_PATHS[4], title: titles[4], category: categories[4], year: years[4], variant: 'grid' },
-      { src: paths[5] ?? paths[0] ?? FALLBACK_REEL_PATHS[5], title: titles[5], category: categories[5], year: years[5], variant: 'grid' },
+      { src: paths[0] ?? FALLBACK_REEL_PATHS[0], title: titles[0], category: categories[0], year: years[0] },
+      { src: paths[1] ?? paths[0] ?? FALLBACK_REEL_PATHS[1], title: titles[1], category: categories[1], year: years[1] },
+      { src: paths[2] ?? paths[0] ?? FALLBACK_REEL_PATHS[2], title: titles[2], category: categories[2], year: years[2] },
+      { src: paths[3] ?? paths[0] ?? FALLBACK_REEL_PATHS[3], title: titles[3], category: categories[3], year: years[3] },
+      { src: paths[4] ?? paths[0] ?? FALLBACK_REEL_PATHS[4], title: titles[4], category: categories[4], year: years[4] },
     ]
   }, [paths])
+
+  const marqueeTiles = useMemo(() => [...tiles, ...tiles], [tiles])
 
   return (
     <section
@@ -150,25 +150,15 @@ export default function VerticalReelsCarousel() {
           </div>
           <div className="mt-2 h-px w-full bg-[var(--light-border)]" />
 
-          <Reveal
-            className="grid grid-cols-1 gap-3 md:grid-cols-12 md:gap-4"
-            duration={0.6}
-            direction="up"
-          >
-            {tiles[0] && (
-              <div className="md:col-span-8">
-                <ReelTileCard tile={tiles[0]} />
-              </div>
-            )}
-            <div className="flex flex-col gap-4 md:col-span-4">
-              {tiles[1] && <ReelTileCard tile={tiles[1]} />}
-              {tiles[2] && <ReelTileCard tile={tiles[2]} />}
+          <Reveal className="overflow-hidden" duration={0.6} direction="up">
+            <div
+              className="flex w-max gap-4"
+              style={{ animation: reduceMotion ? 'none' : 'homeMarquee 36s linear infinite' }}
+            >
+              {marqueeTiles.map((tile, i) => (
+                <ReelTileCard key={`${tile.title}-${i}`} tile={tile} />
+              ))}
             </div>
-            {tiles.slice(3, 6).map((tile, i) => (
-              <div key={i} className="md:col-span-4">
-                <ReelTileCard tile={tile} />
-              </div>
-            ))}
           </Reveal>
         </div>
       </Container>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { caseStudies, getCaseStudyBySlug, getCaseStudyById } from '@/data/caseStudies'
-import CaseStudySidebar from '@/components/CaseStudySidebar'
+import { getHorizontalPhoto } from '@/data/placeholderPhotos'
 import Container from '@/components/ui/Container'
 import Section from '@/components/ui/Section'
 import Reveal from '@/components/motion/Reveal'
@@ -38,7 +38,6 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <div className="pt-24">
-      <CaseStudySidebar />
       <Section>
         <Container narrow>
           {/* Title + client + At A Glance */}
@@ -161,10 +160,17 @@ export default async function CaseStudyPage({ params }: Props) {
                   <Link
                     key={r.id}
                     href={`/case-studies/${r.slug}`}
-                    className="block border border-bone/10 p-6 transition hover:border-bone/30"
+                    className="block overflow-hidden border border-bone/10 transition hover:border-bone/30"
                   >
+                    <div
+                      className="aspect-[16/9] w-full border-b border-bone/10 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${getHorizontalPhoto(Number(r.id) % 4)})` }}
+                      aria-hidden
+                    />
+                    <div className="p-6">
                     <h3 className="text-lg font-bold text-bone">{r.title}</h3>
                     <p className="mt-1 text-sm text-bone/70">{r.client}</p>
+                    </div>
                   </Link>
                 ))}
               </div>

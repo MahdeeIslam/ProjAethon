@@ -125,7 +125,12 @@ const META_BY_YOUTUBE_ID: Record<string, Partial<PortfolioItemMeta>> = {
 
 function getFilename(path: string): string {
   const parts = path.split('/')
-  return parts[parts.length - 1] ?? path
+  const raw = parts[parts.length - 1] ?? path
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return raw
+  }
 }
 
 export function getMetaForReel(path: string): PortfolioItemMeta {
