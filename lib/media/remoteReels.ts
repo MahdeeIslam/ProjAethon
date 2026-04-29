@@ -7,10 +7,10 @@ const HORIZONTAL_FILENAMES = [
 ] as const
 
 const VERTICAL_FILENAMES = [
-  'MVM DR Mustafa V2.mp4',
-  'MVM GAZA UPDATEDv3.mp4',
+  'MVM DR Mustafa V2.vp4',
+  'mvm gaza no intro.mp4',
   'Musibah.mp4',
-  'TAOFIQ STORY V2.mp4',
+  'Ree#1 03.MP4',
 ] as const
 
 function trimTrailingSlash(url: string): string {
