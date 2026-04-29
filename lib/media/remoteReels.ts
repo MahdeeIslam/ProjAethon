@@ -18,7 +18,7 @@ function trimTrailingSlash(url: string): string {
 }
 
 function toPublicUrl(baseUrl: string, folder: 'Horizontal' | 'Vertical', filename: string): string {
-  return `${trimTrailingSlash(baseUrl)}/reels/${folder}/${encodeURIComponent(filename)}`
+  return `${trimTrailingSlash(baseUrl)}/${folder}/${encodeURIComponent(filename)}`
 }
 
 export function getRemoteHorizontalReels(baseUrl: string): string[] {
