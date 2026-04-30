@@ -25,17 +25,29 @@ interface ReelTile {
   category: string
   year: string
   format: 'vertical' | 'horizontal'
+  fallbackSources: string[]
 }
 
 function ReelTileCard({ tile }: { tile: ReelTile }) {
   const [videoFailed, setVideoFailed] = useState(false)
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
-  const reel = useMemo(() => normalizeReelInput(tile.src), [tile.src])
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const activeSrc = useMemo(() => {
+    const unique = tile.fallbackSources.length > 0 ? tile.fallbackSources : [tile.src]
+    return unique[sourceIndex % unique.length] ?? tile.src
+  }, [tile.fallbackSources, tile.src, sourceIndex])
+  const reel = useMemo(() => normalizeReelInput(activeSrc), [activeSrc])
 
   useEffect(() => {
     if (reel.source === 'youtube') setVideoLoaded(true)
   }, [reel.source])
+
+  useEffect(() => {
+    setSourceIndex(0)
+    setVideoFailed(false)
+    setVideoLoaded(false)
+  }, [tile.src, tile.fallbackSources])
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -62,7 +74,15 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
             reduceMotion={false}
             mediaClassName={`transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
             videoStyle={{ filter: 'saturate(1.05) contrast(1.02)' }}
-            onVideoError={() => setVideoFailed(true)}
+            onVideoError={() => {
+              const total = Math.max(tile.fallbackSources.length, 1)
+              if (sourceIndex + 1 < total) {
+                setSourceIndex((prev) => prev + 1)
+                setVideoLoaded(false)
+                return
+              }
+              setVideoFailed(true)
+            }}
             onVideoReady={() => setVideoLoaded(true)}
           />
         )}
@@ -94,6 +114,8 @@ export default function VerticalReelsCarousel() {
   const [verticalPaths, setVerticalPaths] = useState<string[]>([])
   const [horizontalPaths, setHorizontalPaths] = useState<string[]>([])
   const [reduceMotion, setReduceMotion] = useState(false)
+  const [horizontalOffset, setHorizontalOffset] = useState(0)
+  const [verticalOffset, setVerticalOffset] = useState(0)
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -140,33 +162,58 @@ export default function VerticalReelsCarousel() {
   const verticalPool = shuffledVerticalPool ?? verticalBasePool
   const horizontalPool = shuffledHorizontalPool ?? horizontalBasePool
 
+  useEffect(() => {
+    if (reduceMotion) return
+    const timer = window.setInterval(() => {
+      setHorizontalOffset((prev) => prev + 1)
+      setVerticalOffset((prev) => prev + 1)
+    }, 4500)
+    return () => window.clearInterval(timer)
+  }, [reduceMotion])
+
+  const rotateByOffset = (arr: string[], offset: number): string[] => {
+    if (arr.length === 0) return arr
+    const idx = ((offset % arr.length) + arr.length) % arr.length
+    return [...arr.slice(idx), ...arr.slice(0, idx)]
+  }
+  const rotatedHorizontal = useMemo(
+    () => rotateByOffset(horizontalPool, horizontalOffset),
+    [horizontalPool, horizontalOffset]
+  )
+  const rotatedVertical = useMemo(
+    () => rotateByOffset(verticalPool, verticalOffset),
+    [verticalPool, verticalOffset]
+  )
+
   const verticalTiles = useMemo((): ReelTile[] => {
     const titles = ['Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series']
     const categories = ['Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital']
     const years = ['2024', '2024', '2023', '2024', '2023']
 
-    return verticalPool.map((src, i) => ({
+    return rotatedVertical.map((src, i) => ({
       src,
       title: titles[i % titles.length],
       category: categories[i % categories.length],
       year: years[i % years.length],
       format: 'vertical',
+      fallbackSources: rotatedVertical,
     }))
-  }, [verticalPool])
+  }, [rotatedVertical])
 
   const horizontalTiles = useMemo((): ReelTile[] => {
     const titles = ['Elders Promo', 'Third Space Teaser', 'UMMA Promo', 'Client Showreel', 'Event Recap']
     const categories = ['Institutional', 'Narrative', 'Institutional', 'Digital', 'Institutional']
     const years = ['2024', '2024', '2024', '2024', '2024']
 
-    return horizontalPool.map((src, i) => ({
+    return rotatedHorizontal.map((src, i) => ({
       src,
       title: titles[i % titles.length],
       category: categories[i % categories.length],
       year: years[i % years.length],
       format: 'horizontal',
+      fallbackSources: rotatedHorizontal,
     }))
-  }, [horizontalPool])
+  }, [rotatedHorizontal])
 
   const horizontalMarqueeTiles = useMemo(
     () => (horizontalTiles.length > 0 ? [...horizontalTiles, ...horizontalTiles] : []),

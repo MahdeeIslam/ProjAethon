@@ -7,7 +7,9 @@ const HORIZONTAL_FILENAMES = [
 ] as const
 
 const VERTICAL_FILENAMES = [
-  'MVM DR Mustafa V2.vp4',
+  'Copy of M Gala Dinner Promo vid 1.mp4',
+  'Copy of Shayan Alararming vid.mp4',
+  'Copy of Yussf Xenocel Branding vid.mp4',
   'mvm gaza no intro.mp4',
   'Musibah.mp4',
   'Ree#1 03.MP4',
