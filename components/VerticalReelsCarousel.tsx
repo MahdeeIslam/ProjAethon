@@ -25,29 +25,22 @@ interface ReelTile {
   category: string
   year: string
   format: 'vertical' | 'horizontal'
-  fallbackSources: string[]
 }
 
 function ReelTileCard({ tile }: { tile: ReelTile }) {
   const [videoFailed, setVideoFailed] = useState(false)
   const [videoLoaded, setVideoLoaded] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
-  const [sourceIndex, setSourceIndex] = useState(0)
-  const activeSrc = useMemo(() => {
-    const unique = tile.fallbackSources.length > 0 ? tile.fallbackSources : [tile.src]
-    return unique[sourceIndex % unique.length] ?? tile.src
-  }, [tile.fallbackSources, tile.src, sourceIndex])
-  const reel = useMemo(() => normalizeReelInput(activeSrc), [activeSrc])
+  const reel = useMemo(() => normalizeReelInput(tile.src), [tile.src])
 
   useEffect(() => {
     if (reel.source === 'youtube') setVideoLoaded(true)
   }, [reel.source])
 
   useEffect(() => {
-    setSourceIndex(0)
     setVideoFailed(false)
     setVideoLoaded(false)
-  }, [tile.src, tile.fallbackSources])
+  }, [tile.src])
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -74,15 +67,7 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
             reduceMotion={false}
             mediaClassName={`transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
             videoStyle={{ filter: 'saturate(1.05) contrast(1.02)' }}
-            onVideoError={() => {
-              const total = Math.max(tile.fallbackSources.length, 1)
-              if (sourceIndex + 1 < total) {
-                setSourceIndex((prev) => prev + 1)
-                setVideoLoaded(false)
-                return
-              }
-              setVideoFailed(true)
-            }}
+            onVideoError={() => setVideoFailed(true)}
             onVideoReady={() => setVideoLoaded(true)}
           />
         )}
@@ -196,7 +181,6 @@ export default function VerticalReelsCarousel() {
       category: categories[i % categories.length],
       year: years[i % years.length],
       format: 'vertical',
-      fallbackSources: rotatedVertical,
     }))
   }, [rotatedVertical])
 
@@ -211,7 +195,6 @@ export default function VerticalReelsCarousel() {
       category: categories[i % categories.length],
       year: years[i % years.length],
       format: 'horizontal',
-      fallbackSources: rotatedHorizontal,
     }))
   }, [rotatedHorizontal])
 
