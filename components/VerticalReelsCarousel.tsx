@@ -9,7 +9,8 @@ import { YT } from '@/data/videoUrls'
 import { normalizeReelInput } from '@/lib/media/normalizeReel'
 import ReelSurface from '@/components/media/ReelSurface'
 
-const FALLBACK_REEL_PATHS = [...YT.verticalReels]
+const FALLBACK_VERTICAL_REELS = [...YT.verticalReels]
+const FALLBACK_HORIZONTAL_REELS = [...YT.horizontalReels]
 
 const HERO_BACKGROUND_PATTERNS = ['backgroun', 'background', 'hero-loop']
 
@@ -23,6 +24,7 @@ interface ReelTile {
   title: string
   category: string
   year: string
+  format: 'vertical' | 'horizontal'
 }
 
 function ReelTileCard({ tile }: { tile: ReelTile }) {
@@ -42,7 +44,11 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
   return (
     <Link
       href="/portfolio"
-      className="group relative block h-[260px] w-[220px] shrink-0 overflow-hidden rounded-[20px] border-2 border-black/10 bg-white shadow-md transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 focus:ring-offset-[#f5f4f0] sm:h-[320px] sm:w-[260px] md:h-[360px] md:w-[290px]"
+      className={`group relative block shrink-0 overflow-hidden rounded-[20px] border-2 border-black/10 bg-white shadow-md transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 focus:ring-offset-[#f5f4f0] ${
+        tile.format === 'vertical'
+          ? 'h-[260px] w-[220px] sm:h-[320px] sm:w-[260px] md:h-[360px] md:w-[290px]'
+          : 'h-[150px] w-[260px] sm:h-[185px] sm:w-[320px] md:h-[220px] md:w-[380px]'
+      }`}
     >
       <div className="absolute inset-0 bg-[#252525]">
         {!videoFailed && !reduceMotion && (
@@ -85,48 +91,91 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
 }
 
 export default function VerticalReelsCarousel() {
-  const [reelPaths, setReelPaths] = useState<string[]>([])
+  const [verticalPaths, setVerticalPaths] = useState<string[]>([])
+  const [horizontalPaths, setHorizontalPaths] = useState<string[]>([])
   const [reduceMotion, setReduceMotion] = useState(false)
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-    fetch('/api/reels')
-      .then((res) => res.json())
-      .then((data: { paths: string[] }) => {
-        const paths = Array.isArray(data.paths) ? data.paths : []
-        const filtered = paths.filter((p) => !isHeroBackground(p))
-        setReelPaths(filtered.length > 0 ? filtered : FALLBACK_REEL_PATHS)
-      })
-      .catch(() => setReelPaths(FALLBACK_REEL_PATHS))
+    Promise.all([
+      fetch('/api/reels')
+        .then((res) => res.json())
+        .catch(() => ({ paths: [] as string[] })),
+      fetch('/api/reels/horizontal')
+        .then((res) => res.json())
+        .catch(() => ({ paths: [] as string[] })),
+    ]).then(([verticalData, horizontalData]) => {
+      const v: string[] = Array.isArray(verticalData.paths) ? verticalData.paths : []
+      const h: string[] = Array.isArray(horizontalData.paths) ? horizontalData.paths : []
+      const filteredVertical = v.filter((p) => !isHeroBackground(p))
+      setVerticalPaths(filteredVertical.length > 0 ? filteredVertical : FALLBACK_VERTICAL_REELS)
+      setHorizontalPaths(h.length > 0 ? h : FALLBACK_HORIZONTAL_REELS)
+    })
   }, [])
 
-  const basePool = useMemo(() => {
-    const merged = reelPaths.length > 0 ? reelPaths : FALLBACK_REEL_PATHS
+  const verticalBasePool = useMemo(() => {
+    const merged = verticalPaths.length > 0 ? verticalPaths : FALLBACK_VERTICAL_REELS
     return [...merged].sort((a, b) => a.localeCompare(b))
-  }, [reelPaths])
+  }, [verticalPaths])
 
-  const [shuffledPool, setShuffledPool] = useState<string[] | null>(null)
+  const horizontalBasePool = useMemo(() => {
+    const merged = horizontalPaths.length > 0 ? horizontalPaths : FALLBACK_HORIZONTAL_REELS
+    return [...merged].sort((a, b) => a.localeCompare(b))
+  }, [horizontalPaths])
+
+  const [shuffledVerticalPool, setShuffledVerticalPool] = useState<string[] | null>(null)
+  const [shuffledHorizontalPool, setShuffledHorizontalPool] = useState<string[] | null>(null)
   useEffect(() => {
-    setShuffledPool(shuffleDeterministic([...basePool], `${getReelShuffleSeed()}-vert-carousel`))
-  }, [basePool])
+    setShuffledVerticalPool(
+      shuffleDeterministic([...verticalBasePool], `${getReelShuffleSeed()}-vert-carousel`)
+    )
+  }, [verticalBasePool])
 
-  const paths = shuffledPool ?? basePool
+  useEffect(() => {
+    setShuffledHorizontalPool(
+      shuffleDeterministic([...horizontalBasePool], `${getReelShuffleSeed()}-horiz-carousel`)
+    )
+  }, [horizontalBasePool])
 
-  const tiles = useMemo((): ReelTile[] => {
+  const verticalPool = shuffledVerticalPool ?? verticalBasePool
+  const horizontalPool = shuffledHorizontalPool ?? horizontalBasePool
+
+  const verticalTiles = useMemo((): ReelTile[] => {
     const titles = ['Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series']
     const categories = ['Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital']
     const years = ['2024', '2024', '2023', '2024', '2023']
 
-    return [
-      { src: paths[0] ?? FALLBACK_REEL_PATHS[0], title: titles[0], category: categories[0], year: years[0] },
-      { src: paths[1] ?? paths[0] ?? FALLBACK_REEL_PATHS[1], title: titles[1], category: categories[1], year: years[1] },
-      { src: paths[2] ?? paths[0] ?? FALLBACK_REEL_PATHS[2], title: titles[2], category: categories[2], year: years[2] },
-      { src: paths[3] ?? paths[0] ?? FALLBACK_REEL_PATHS[3], title: titles[3], category: categories[3], year: years[3] },
-      { src: paths[4] ?? paths[0] ?? FALLBACK_REEL_PATHS[4], title: titles[4], category: categories[4], year: years[4] },
-    ]
-  }, [paths])
+    return verticalPool.map((src, i) => ({
+      src,
+      title: titles[i % titles.length],
+      category: categories[i % categories.length],
+      year: years[i % years.length],
+      format: 'vertical',
+    }))
+  }, [verticalPool])
 
-  const marqueeTiles = useMemo(() => [...tiles, ...tiles], [tiles])
+  const horizontalTiles = useMemo((): ReelTile[] => {
+    const titles = ['Elders Promo', 'Third Space Teaser', 'UMMA Promo', 'Client Showreel', 'Event Recap']
+    const categories = ['Institutional', 'Narrative', 'Institutional', 'Digital', 'Institutional']
+    const years = ['2024', '2024', '2024', '2024', '2024']
+
+    return horizontalPool.map((src, i) => ({
+      src,
+      title: titles[i % titles.length],
+      category: categories[i % categories.length],
+      year: years[i % years.length],
+      format: 'horizontal',
+    }))
+  }, [horizontalPool])
+
+  const horizontalMarqueeTiles = useMemo(
+    () => (horizontalTiles.length > 0 ? [...horizontalTiles, ...horizontalTiles] : []),
+    [horizontalTiles]
+  )
+  const verticalMarqueeTiles = useMemo(
+    () => (verticalTiles.length > 0 ? [...verticalTiles, ...verticalTiles] : []),
+    [verticalTiles]
+  )
 
   return (
     <section
@@ -150,16 +199,37 @@ export default function VerticalReelsCarousel() {
           </div>
           <div className="mt-2 h-px w-full bg-[var(--light-border)]" />
 
-          <Reveal className="overflow-hidden" duration={0.6} direction="up">
-            <div
-              className="flex w-max gap-4"
-              style={{ animation: reduceMotion ? 'none' : 'homeMarquee 36s linear infinite' }}
-            >
-              {marqueeTiles.map((tile, i) => (
-                <ReelTileCard key={`${tile.title}-${i}`} tile={tile} />
-              ))}
-            </div>
-          </Reveal>
+          {horizontalMarqueeTiles.length > 0 && (
+            <Reveal className="overflow-hidden" duration={0.6} direction="up">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--light-text)]/55">
+                Horizontal reels
+              </p>
+              <div
+                className="flex w-max gap-4"
+                style={{ animation: reduceMotion ? 'none' : 'homeMarquee 42s linear infinite' }}
+              >
+                {horizontalMarqueeTiles.map((tile, i) => (
+                  <ReelTileCard key={`horizontal-${tile.src}-${i}`} tile={tile} />
+                ))}
+              </div>
+            </Reveal>
+          )}
+
+          {verticalMarqueeTiles.length > 0 && (
+            <Reveal className="overflow-hidden pt-6" duration={0.6} direction="up">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--light-text)]/55">
+                Vertical reels
+              </p>
+              <div
+                className="flex w-max gap-4"
+                style={{ animation: reduceMotion ? 'none' : 'homeMarquee 34s linear infinite' }}
+              >
+                {verticalMarqueeTiles.map((tile, i) => (
+                  <ReelTileCard key={`vertical-${tile.src}-${i}`} tile={tile} />
+                ))}
+              </div>
+            </Reveal>
+          )}
         </div>
       </Container>
     </section>
