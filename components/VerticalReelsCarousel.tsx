@@ -66,7 +66,8 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
       {/* Layer 1: rich placeholder so the card always reads as cinematic */}
       <div className="absolute inset-0" style={POSTER_BG} aria-hidden />
 
-      {/* Layer 2: video (mp4 lazy-mounts via ReelVideo IO logic) */}
+      {/* Layer 2: video — every marquee tile is eager + priority so the row
+          feels alive simultaneously instead of buffering as it scrolls. */}
       {!videoFailed && !reduceMotion && (
         <ReelSurface
           reel={reel}
@@ -76,6 +77,7 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
           muted
           loop
           reduceMotion={false}
+          priority
           mediaClassName={`transition-opacity duration-700 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
           videoStyle={{ filter: 'saturate(1.06) contrast(1.02)' }}
           onVideoError={() => setVideoFailed(true)}

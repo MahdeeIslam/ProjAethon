@@ -2,8 +2,8 @@
  * Remote reel manifest for Cloudflare R2 (or any compatible CDN).
  *
  * Bucket layout (as of May 2026):
- *   - Vertical clips live at the BUCKET ROOT (no subfolder).
  *   - Horizontal clips live under the `Horizontal/` subfolder.
+ *   - Vertical clips live under the `Vertical/` subfolder.
  *
  * Update these arrays when you upload new files to R2 — names must match
  * the object keys in the bucket exactly (including spaces, casing, and `#`).
@@ -20,7 +20,6 @@ const HORIZONTAL_FILENAMES = [
   'Copy of Copy of DWF scene 3 final v5.mp4',
 ] as const
 
-/** Vertical files are stored at the bucket root in this configuration. */
 const VERTICAL_FILENAMES = [
   'Musibah.mp4',
   'MVM DR Mustafa V2.mp4',
@@ -47,7 +46,6 @@ export function getRemoteHorizontalReels(baseUrl: string): string[] {
   return HORIZONTAL_FILENAMES.map((name) => joinPublicUrl(baseUrl, 'Horizontal', name))
 }
 
-/** Vertical clips are at the bucket root → no folder segment. */
 export function getRemoteVerticalReels(baseUrl: string): string[] {
-  return VERTICAL_FILENAMES.map((name) => joinPublicUrl(baseUrl, '', name))
+  return VERTICAL_FILENAMES.map((name) => joinPublicUrl(baseUrl, 'Vertical', name))
 }

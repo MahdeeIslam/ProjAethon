@@ -107,7 +107,9 @@ export default function ReelVideo({
       loop={loop}
       playsInline={playsInline}
       autoPlay={priority && autoplay}
-      preload={priority ? 'metadata' : 'none'}
+      // Priority tiles aggressively prefetch so the showcase reels feel
+      // simultaneously alive on first paint. Lazy tiles stay polite.
+      preload={priority ? 'auto' : 'none'}
       onError={onError}
       onLoadedData={onLoadedData}
       onPlay={() => {
