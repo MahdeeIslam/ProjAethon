@@ -400,6 +400,16 @@ html {
   100% { transform: translateX(-50%); }
 }
 
+@keyframes homeMarqueeReverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes shimmerSlide {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(220%); }
+}
+
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;

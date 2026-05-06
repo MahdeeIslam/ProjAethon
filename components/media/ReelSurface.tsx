@@ -18,6 +18,8 @@ export default function ReelSurface({
   loop = true,
   showControls = false,
   reduceMotion = false,
+  /** Eager-load + always play (for the hero only). */
+  priority = false,
   videoStyle,
   onVideoError,
   onVideoReady,
@@ -33,6 +35,7 @@ export default function ReelSurface({
   loop?: boolean
   showControls?: boolean
   reduceMotion?: boolean
+  priority?: boolean
   videoStyle?: CSSProperties
   onVideoError?: () => void
   onVideoReady?: () => void
@@ -40,7 +43,7 @@ export default function ReelSurface({
   if (reduceMotion) {
     return (
       <div
-        className={`absolute inset-0 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] ${mediaClassName}`.trim()}
+        className={`absolute inset-0 bg-gradient-to-br from-[#2a2a2a] via-[#222] to-[#181818] ${mediaClassName}`.trim()}
       />
     )
   }
@@ -63,6 +66,7 @@ export default function ReelSurface({
           autoplay={autoplay}
           muted={muted}
           loop={loop}
+          priority={priority}
           style={videoStyle}
           onError={onVideoError}
           onLoadedData={onVideoReady}
@@ -74,7 +78,7 @@ export default function ReelSurface({
 
   if (!reel.youtubeId) {
     return (
-      <div className={`absolute inset-0 bg-gradient-to-b from-[#2a2a2a] to-[#1a1a1a] ${className}`.trim()} />
+      <div className={`absolute inset-0 bg-gradient-to-br from-[#2a2a2a] via-[#222] to-[#181818] ${className}`.trim()} />
     )
   }
 

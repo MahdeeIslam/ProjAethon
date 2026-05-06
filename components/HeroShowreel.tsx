@@ -106,6 +106,7 @@ export default function HeroShowreel() {
             loop
             showControls={false}
             reduceMotion={false}
+            priority
             mediaClassName="opacity-[0.75] transition-transform duration-700 ease-out motion-reduce:transition-none group-hover/hero:scale-[1.02]"
           />
         ) : (

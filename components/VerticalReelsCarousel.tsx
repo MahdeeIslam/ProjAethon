@@ -27,6 +27,13 @@ interface ReelTile {
   format: 'vertical' | 'horizontal'
 }
 
+/** Shimmer + soft gradient backdrop so cards never look like a flat black box. */
+const POSTER_BG: React.CSSProperties = {
+  backgroundImage:
+    'radial-gradient(ellipse 70% 65% at 50% 35%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 45%, rgba(0,0,0,0.55) 100%), linear-gradient(135deg, #2a2724 0%, #1c1a18 100%)',
+  backgroundBlendMode: 'overlay, normal',
+}
+
 function ReelTileCard({ tile }: { tile: ReelTile }) {
   const [videoFailed, setVideoFailed] = useState(false)
   const [videoLoaded, setVideoLoaded] = useState(false)
@@ -49,36 +56,50 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
   return (
     <Link
       href="/portfolio"
-      className={`group relative block shrink-0 overflow-hidden rounded-[20px] border-2 border-black/10 bg-white shadow-md transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 focus:ring-offset-[#f5f4f0] ${
+      aria-label={`${tile.title} — ${tile.category} ${tile.year}`}
+      className={`group relative block shrink-0 overflow-hidden rounded-[22px] border border-black/10 bg-[#1c1a18] shadow-[0_4px_18px_rgba(0,0,0,0.18)] transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(0,0,0,0.32)] focus:outline-none focus-visible:ring-2 focus-visible:ring-black/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f4f0] ${
         tile.format === 'vertical'
-          ? 'h-[260px] w-[220px] sm:h-[320px] sm:w-[260px] md:h-[360px] md:w-[290px]'
-          : 'h-[150px] w-[260px] sm:h-[185px] sm:w-[320px] md:h-[220px] md:w-[380px]'
+          ? 'h-[280px] w-[230px] sm:h-[340px] sm:w-[265px] md:h-[380px] md:w-[295px]'
+          : 'h-[170px] w-[280px] sm:h-[200px] sm:w-[340px] md:h-[230px] md:w-[400px]'
       }`}
     >
-      <div className="absolute inset-0 bg-[#252525]">
-        {!videoFailed && !reduceMotion && (
-          <ReelSurface
-            reel={reel}
-            context="grid"
-            title={tile.title}
-            autoplay
-            muted
-            loop
-            reduceMotion={false}
-            mediaClassName={`transition-opacity duration-500 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
-            videoStyle={{ filter: 'saturate(1.05) contrast(1.02)' }}
-            onVideoError={() => setVideoFailed(true)}
-            onVideoReady={() => setVideoLoaded(true)}
+      {/* Layer 1: rich placeholder so the card always reads as cinematic */}
+      <div className="absolute inset-0" style={POSTER_BG} aria-hidden />
+
+      {/* Layer 2: video (mp4 lazy-mounts via ReelVideo IO logic) */}
+      {!videoFailed && !reduceMotion && (
+        <ReelSurface
+          reel={reel}
+          context="grid"
+          title={tile.title}
+          autoplay
+          muted
+          loop
+          reduceMotion={false}
+          mediaClassName={`transition-opacity duration-700 ${videoLoaded ? 'opacity-100' : 'opacity-0'}`}
+          videoStyle={{ filter: 'saturate(1.06) contrast(1.02)' }}
+          onVideoError={() => setVideoFailed(true)}
+          onVideoReady={() => setVideoLoaded(true)}
+        />
+      )}
+
+      {/* Layer 3: shimmer while loading (fades out once video shows) */}
+      {!videoLoaded && !videoFailed && !reduceMotion && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute inset-y-0 -left-1/3 w-1/2 opacity-40"
+            style={{
+              background:
+                'linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.10) 50%, transparent 100%)',
+              animation: 'shimmerSlide 2.6s ease-in-out infinite',
+            }}
           />
-        )}
-        {(videoFailed || reduceMotion) && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#3a3a3a] to-[#1a1a1a]">
-            <span className="text-xs font-medium uppercase tracking-wider text-bone/40">Preview</span>
-          </div>
-        )}
-      </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/10" />
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-4 md:p-5">
+        </div>
+      )}
+
+      {/* Layer 4: gradient + caption overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-black/0" />
+      <div className="absolute inset-x-0 bottom-0 z-10 p-4 md:p-5">
         <span className="block text-sm font-bold uppercase tracking-[0.12em] text-bone drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] md:text-base">
           {tile.title}
         </span>
@@ -95,12 +116,18 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
   )
 }
 
+const VERTICAL_TITLES = ['Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series', 'Brand Highlight']
+const VERTICAL_CATEGORIES = ['Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital', 'Brand']
+const VERTICAL_YEARS = ['2024', '2024', '2023', '2024', '2023', '2024']
+
+const HORIZONTAL_TITLES = ['Elders Promo', 'Third Space Teaser', 'UMMA Promo', 'Client Showreel', 'Event Recap', 'Bonfire Vid']
+const HORIZONTAL_CATEGORIES = ['Institutional', 'Narrative', 'Institutional', 'Digital', 'Institutional', 'Narrative']
+const HORIZONTAL_YEARS = ['2024', '2024', '2024', '2024', '2024', '2024']
+
 export default function VerticalReelsCarousel() {
   const [verticalPaths, setVerticalPaths] = useState<string[]>([])
   const [horizontalPaths, setHorizontalPaths] = useState<string[]>([])
   const [reduceMotion, setReduceMotion] = useState(false)
-  const [horizontalOffset, setHorizontalOffset] = useState(0)
-  const [verticalOffset, setVerticalOffset] = useState(0)
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -147,57 +174,27 @@ export default function VerticalReelsCarousel() {
   const verticalPool = shuffledVerticalPool ?? verticalBasePool
   const horizontalPool = shuffledHorizontalPool ?? horizontalBasePool
 
-  useEffect(() => {
-    if (reduceMotion) return
-    const timer = window.setInterval(() => {
-      setHorizontalOffset((prev) => prev + 1)
-      setVerticalOffset((prev) => prev + 1)
-    }, 4500)
-    return () => window.clearInterval(timer)
-  }, [reduceMotion])
-
-  const rotateByOffset = (arr: string[], offset: number): string[] => {
-    if (arr.length === 0) return arr
-    const idx = ((offset % arr.length) + arr.length) % arr.length
-    return [...arr.slice(idx), ...arr.slice(0, idx)]
-  }
-  const rotatedHorizontal = useMemo(
-    () => rotateByOffset(horizontalPool, horizontalOffset),
-    [horizontalPool, horizontalOffset]
-  )
-  const rotatedVertical = useMemo(
-    () => rotateByOffset(verticalPool, verticalOffset),
-    [verticalPool, verticalOffset]
-  )
-
   const verticalTiles = useMemo((): ReelTile[] => {
-    const titles = ['Muslim Votes Matter', 'Virgin Mary Mosque', 'Taqwa Initiative', 'Community Campaign', 'Institutional Series']
-    const categories = ['Narrative', 'Digital', 'Institutional', 'Narrative', 'Digital']
-    const years = ['2024', '2024', '2023', '2024', '2023']
-
-    return rotatedVertical.map((src, i) => ({
+    return verticalPool.map((src, i) => ({
       src,
-      title: titles[i % titles.length],
-      category: categories[i % categories.length],
-      year: years[i % years.length],
+      title: VERTICAL_TITLES[i % VERTICAL_TITLES.length],
+      category: VERTICAL_CATEGORIES[i % VERTICAL_CATEGORIES.length],
+      year: VERTICAL_YEARS[i % VERTICAL_YEARS.length],
       format: 'vertical',
     }))
-  }, [rotatedVertical])
+  }, [verticalPool])
 
   const horizontalTiles = useMemo((): ReelTile[] => {
-    const titles = ['Elders Promo', 'Third Space Teaser', 'UMMA Promo', 'Client Showreel', 'Event Recap']
-    const categories = ['Institutional', 'Narrative', 'Institutional', 'Digital', 'Institutional']
-    const years = ['2024', '2024', '2024', '2024', '2024']
-
-    return rotatedHorizontal.map((src, i) => ({
+    return horizontalPool.map((src, i) => ({
       src,
-      title: titles[i % titles.length],
-      category: categories[i % categories.length],
-      year: years[i % years.length],
+      title: HORIZONTAL_TITLES[i % HORIZONTAL_TITLES.length],
+      category: HORIZONTAL_CATEGORIES[i % HORIZONTAL_CATEGORIES.length],
+      year: HORIZONTAL_YEARS[i % HORIZONTAL_YEARS.length],
       format: 'horizontal',
     }))
-  }, [rotatedHorizontal])
+  }, [horizontalPool])
 
+  // Duplicate tiles so the marquee animates seamlessly (left edge feeds the right).
   const horizontalMarqueeTiles = useMemo(
     () => (horizontalTiles.length > 0 ? [...horizontalTiles, ...horizontalTiles] : []),
     [horizontalTiles]
@@ -216,10 +213,18 @@ export default function VerticalReelsCarousel() {
     >
       <Container wide>
         <div className="space-y-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-            <h2 className="text-3xl font-bold uppercase tracking-tight text-[var(--light-text)] md:text-4xl lg:text-[2.25rem]">
-              Work in motion
-            </h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--light-text)]/55">
+                Live reel
+              </p>
+              <h2 className="text-3xl font-bold uppercase tracking-tight text-[var(--light-text)] md:text-4xl lg:text-[2.5rem]">
+                Work in motion
+              </h2>
+              <p className="mt-3 max-w-xl text-sm text-[var(--light-text)]/70 md:text-base">
+                A continuously refreshed wall of recent client output — from institutional campaigns to founder narratives.
+              </p>
+            </div>
             <Link
               href="/portfolio"
               className="shrink-0 text-sm font-medium uppercase tracking-wider text-[var(--light-text)]/85 hover:text-[var(--light-text)] border-b-2 border-transparent hover:border-black/30 pb-0.5 transition-colors"
@@ -231,15 +236,15 @@ export default function VerticalReelsCarousel() {
 
           {horizontalMarqueeTiles.length > 0 && (
             <Reveal className="overflow-hidden" duration={0.6} direction="up">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--light-text)]/55">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--light-text)]/50">
                 Horizontal reels
               </p>
               <div
-                className="flex w-max gap-4"
-                style={{ animation: reduceMotion ? 'none' : 'homeMarquee 42s linear infinite' }}
+                className="flex w-max gap-4 will-change-transform"
+                style={{ animation: reduceMotion ? 'none' : 'homeMarquee 56s linear infinite' }}
               >
                 {horizontalMarqueeTiles.map((tile, i) => (
-                  <ReelTileCard key={`horizontal-${tile.src}-${i}`} tile={tile} />
+                  <ReelTileCard key={`horizontal-${i}-${tile.src}`} tile={tile} />
                 ))}
               </div>
             </Reveal>
@@ -247,15 +252,15 @@ export default function VerticalReelsCarousel() {
 
           {verticalMarqueeTiles.length > 0 && (
             <Reveal className="overflow-hidden pt-6" duration={0.6} direction="up">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--light-text)]/55">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--light-text)]/50">
                 Vertical reels
               </p>
               <div
-                className="flex w-max gap-4"
-                style={{ animation: reduceMotion ? 'none' : 'homeMarquee 34s linear infinite' }}
+                className="flex w-max gap-4 will-change-transform"
+                style={{ animation: reduceMotion ? 'none' : 'homeMarqueeReverse 64s linear infinite' }}
               >
                 {verticalMarqueeTiles.map((tile, i) => (
-                  <ReelTileCard key={`vertical-${tile.src}-${i}`} tile={tile} />
+                  <ReelTileCard key={`vertical-${i}-${tile.src}`} tile={tile} />
                 ))}
               </div>
             </Reveal>

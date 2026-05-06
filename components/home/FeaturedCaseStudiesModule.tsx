@@ -236,6 +236,15 @@ export default function FeaturedCaseStudiesModule() {
                       </span>
                     </div>
                     <div className="absolute right-0 top-0 bottom-0 w-[88px] overflow-hidden border-l border-[rgba(245,245,242,0.10)] md:w-[104px]">
+                      {/* Always-on cinematic backdrop so the strip never reads as flat black */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage:
+                            'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.45) 70%), linear-gradient(180deg, #2a2724 0%, #18171a 100%)',
+                        }}
+                        aria-hidden
+                      />
                       <ReelSurface
                         reel={reel}
                         context="featured"
@@ -244,10 +253,10 @@ export default function FeaturedCaseStudiesModule() {
                         muted
                         loop
                         reduceMotion={reduceMotion}
-                        mediaClassName="opacity-55"
+                        mediaClassName="opacity-60"
                         videoStyle={
                           reel.source === 'mp4'
-                            ? { filter: 'blur(10px) saturate(0.9) brightness(0.8)' }
+                            ? { filter: 'blur(8px) saturate(0.95) brightness(0.82)' }
                             : undefined
                         }
                       />
@@ -255,7 +264,7 @@ export default function FeaturedCaseStudiesModule() {
                         className="absolute inset-0 pointer-events-none"
                         style={{
                           background:
-                            'linear-gradient(to left, rgba(26,26,26,0) 0%, rgba(26,26,26,0.65) 100%)',
+                            'linear-gradient(to left, rgba(26,26,26,0) 0%, rgba(26,26,26,0.7) 100%)',
                         }}
                         aria-hidden
                       />
@@ -281,6 +290,15 @@ export default function FeaturedCaseStudiesModule() {
                     className="group relative flex aspect-video w-full flex-col justify-end overflow-hidden rounded-[18px] border border-[rgba(245,245,242,0.12)] bg-black transition-all duration-200 hover:border-[rgba(245,245,242,0.2)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
                   >
                     <div className="absolute inset-0">
+                      {/* Cinematic backdrop = guaranteed visual even before the video loads */}
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          backgroundImage:
+                            'radial-gradient(ellipse 80% 60% at 50% 35%, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.45) 65%), linear-gradient(135deg, #2a2724 0%, #1a1816 100%)',
+                        }}
+                        aria-hidden
+                      />
                       <ReelSurface
                         reel={reel}
                         context="grid"
