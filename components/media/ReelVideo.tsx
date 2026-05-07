@@ -4,16 +4,17 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { notifyPlaying, registerVideo } from '@/lib/media/videoRegistry'
 
 /**
- * Lazy `<video>` wrapper used by every non-hero clip on the site.
+ * Smart `<video>` wrapper used by every clip on the site.
  *
- * Behaviour:
- *  - Does not assign `src` until the element is near the viewport
- *    (IntersectionObserver, rootMargin: 400px).
- *  - Uses `preload="none"` so nothing is fetched on initial page load.
- *  - Pauses automatically when scrolled out of view; resumes on re-enter.
- *  - Coordinates with the global video registry to cap concurrent playback.
- *  - Falls back to the poster (and notifies the parent via `onError`)
- *    if the video can't be loaded.
+ * Two modes:
+ *   • Lazy (default) — src is unset until the tile is near the viewport,
+ *     `preload="none"` keeps page-load light. Plays in / pauses out of view.
+ *   • Priority — src is set immediately and `preload="auto"` warms the
+ *     buffer right away, but playback is still gated by viewport visibility.
+ *     This means visible tiles play instantly (already buffered), while
+ *     off-screen tiles are paused so the browser's video decoder isn't
+ *     overloaded by 16+ simultaneously decoding clips. It's the only way to
+ *     make a media-heavy marquee actually move on real devices.
  */
 export default function ReelVideo({
   src,
@@ -35,7 +36,7 @@ export default function ReelVideo({
   muted?: boolean
   loop?: boolean
   playsInline?: boolean
-  /** Hero / always-on videos opt out of concurrency caps and lazy mounting. */
+  /** Eager-load src + bypass concurrency caps. Visibility still controls play. */
   priority?: boolean
   style?: CSSProperties
   onError?: () => void
@@ -43,25 +44,24 @@ export default function ReelVideo({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [shouldMount, setShouldMount] = useState(priority)
-  const [isInView, setIsInView] = useState(priority)
+  const [isInView, setIsInView] = useState(false)
 
-  // Global play coordination — register/unregister with the shared registry.
+  // Register with the shared registry so the cap can pause LRU non-priority clips.
   useEffect(() => {
     const el = videoRef.current
     if (!el) return
     return registerVideo(el, priority)
   }, [priority])
 
-  // Reset mount/view state if the source changes mid-flight (rare).
+  // Reset mount/view if a non-priority src swaps mid-flight (rare).
   useEffect(() => {
     if (priority) return
     setShouldMount(false)
     setIsInView(false)
   }, [src, priority])
 
-  // Mount the source only when the tile is near the viewport.
+  // IntersectionObserver gates playback for everyone. Lazy tiles also gate `src`.
   useEffect(() => {
-    if (priority) return
     const el = videoRef.current
     if (!el) return
 
@@ -70,7 +70,7 @@ export default function ReelVideo({
         if (!entry) return
         const visible = entry.isIntersecting
         setIsInView(visible)
-        if (visible) setShouldMount(true)
+        if (visible && !priority) setShouldMount(true)
       },
       { rootMargin: '400px 0px', threshold: 0 }
     )
@@ -78,25 +78,26 @@ export default function ReelVideo({
     return () => observer.disconnect()
   }, [priority])
 
-  // Play / pause based on viewport visibility.
+  // Play in view, pause out of view. Applies to both modes — keeps the GPU/CPU sane.
   useEffect(() => {
     const el = videoRef.current
     if (!el || !autoplay) return
 
     if (isInView && shouldMount) {
-      el.play()
-        .then(() => notifyPlaying(el))
-        .catch(() => {
-          /* autoplay may be blocked — poster stays visible until interaction */
+      const playPromise = el.play()
+      if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.then(() => notifyPlaying(el)).catch(() => {
+          /* autoplay blocked — first frame will stay visible until interaction */
         })
-    } else if (!isInView && !priority) {
+      }
+    } else if (!isInView) {
       try {
         el.pause()
       } catch {
         /* element may be detached */
       }
     }
-  }, [isInView, shouldMount, autoplay, priority])
+  }, [isInView, shouldMount, autoplay])
 
   return (
     <video
@@ -107,8 +108,7 @@ export default function ReelVideo({
       loop={loop}
       playsInline={playsInline}
       autoPlay={priority && autoplay}
-      // Priority tiles aggressively prefetch so the showcase reels feel
-      // simultaneously alive on first paint. Lazy tiles stay polite.
+      // Priority tiles warm the buffer ahead of time; lazy tiles stay polite.
       preload={priority ? 'auto' : 'none'}
       onError={onError}
       onLoadedData={onLoadedData}
