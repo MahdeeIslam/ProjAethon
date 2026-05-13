@@ -135,6 +135,7 @@ export default function FeaturedCaseStudiesModule() {
                   muted
                   loop
                   reduceMotion={reduceMotion}
+                  priority
                   mediaClassName="opacity-75 transition-transform duration-700 ease-out group-hover/card:scale-[1.02] motion-reduce:transition-none"
                 />
                 <div
@@ -253,6 +254,7 @@ export default function FeaturedCaseStudiesModule() {
                         muted
                         loop
                         reduceMotion={reduceMotion}
+                        priority
                         mediaClassName="opacity-60"
                         videoStyle={
                           reel.source === 'mp4'
@@ -307,6 +309,7 @@ export default function FeaturedCaseStudiesModule() {
                         muted
                         loop
                         reduceMotion={reduceMotion}
+                        priority
                         mediaClassName="opacity-90 transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none"
                       />
                       <div
