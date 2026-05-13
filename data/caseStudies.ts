@@ -1,10 +1,29 @@
 /**
  * Case studies for index and dynamic detail pages.
- * At A Glance + Problem / AETHON's Solution / The Outcome.
- * Image assets use placeholder photos from placeholders/photos/.
+ *
+ * Each study carries the copy (At A Glance, Problem, AETHON's Solution,
+ * Outcome) plus a layout-aware media spec used by the detail page:
+ *
+ *   - `triple-vertical`     : three vertical R2 reels side-by-side
+ *                             (e.g. Muslim Votes Matter, social campaign)
+ *   - `side-vertical`       : single vertical reel on the right with
+ *                             Problem + Solution body text on the left
+ *                             (e.g. Virgin Mary Mosque, fundraiser story)
+ *   - `horizontal-with-tour`: one full-width horizontal reel plus a
+ *                             three-photo "tour" row beneath the solution
+ *                             (e.g. Arabic Revival 360, event coverage)
+ *
+ * `heroImage` is the relevant thumbnail / banner image — used for the
+ * index card *and* the top-of-page banner on each detail view.
  */
+
 import { getHorizontalPhoto } from './placeholderPhotos'
 import { YT } from './videoUrls'
+
+export type CaseStudyMediaLayout =
+  | 'triple-vertical'
+  | 'side-vertical'
+  | 'horizontal-with-tour'
 
 export interface CaseStudy {
   id: string
@@ -17,15 +36,21 @@ export interface CaseStudy {
   outcome: string
   /** Optional extra outcome bullets */
   keyOutcomes?: string[]
-  assets: { type: 'image' | 'video'; url: string; caption?: string }[]
+  /** Hero / thumbnail image — index card + detail banner. */
+  heroImage: string
+  /** How the detail page renders the main media block. */
+  mediaLayout: CaseStudyMediaLayout
+  /** Reel URLs (R2). 1 for horizontal/side, 3 for triple-vertical. */
+  mediaReels: string[]
+  /** Tour photos (only consumed by 'horizontal-with-tour'). */
+  tourPhotos?: string[]
+  /** Legacy generic assets (kept for safety; not rendered on detail page). */
+  assets?: { type: 'image' | 'video'; url: string; caption?: string }[]
   relatedIds: string[]
-  /** TODO: Map to horizontal reel filename for hero card background. Fallback to first shuffled horizontal reel. */
+  /** Featured reel hint for the homepage Featured Case Studies block. */
   featuredReelSlug?: string
-  /** For hero: 3 stat blocks. Fallback: atAGlance[0..2]. */
   metrics?: Array<{ value: string; label: string }>
-  /** For supporting cards. Fallback: atAGlance[0]. */
   primaryMetric?: { value: string; label: string }
-  /** For supporting cards. Fallback: atAGlance[1]. */
   secondaryMetric?: { value: string; label: string }
 }
 
@@ -34,11 +59,15 @@ export function getMetrics(study: CaseStudy): Array<{ value: string; label: stri
   return study.metrics ?? study.atAGlance.slice(0, 3)
 }
 
-export function getPrimaryMetric(study: CaseStudy): { value: string; label: string } | undefined {
+export function getPrimaryMetric(
+  study: CaseStudy
+): { value: string; label: string } | undefined {
   return study.primaryMetric ?? study.atAGlance[0]
 }
 
-export function getSecondaryMetric(study: CaseStudy): { value: string; label: string } | undefined {
+export function getSecondaryMetric(
+  study: CaseStudy
+): { value: string; label: string } | undefined {
   return study.secondaryMetric ?? study.atAGlance[1]
 }
 
@@ -54,17 +83,21 @@ export const caseStudies: CaseStudy[] = [
       { label: 'Shares', value: '8,000+' },
       { label: 'Impact', value: 'National Political Mobilization' },
     ],
-    problem: 'A civic campaign that needed to cut through noise and mobilize a national audience with limited budget and no existing visual narrative.',
+    problem:
+      'A civic campaign that needed to cut through noise and mobilize a national audience with limited budget and no existing visual narrative.',
     solution: [
       'Created a clear visual and narrative identity for the movement.',
       'Produced high-impact short-form and social content for maximum shareability.',
       'Aligned distribution with grassroots and digital channels for national reach.',
     ],
-    outcome: '500K+ views, 35K+ likes, 8K+ shares, and measurable impact on national political mobilization.',
-    assets: [
-      { type: 'video', url: YT.caseStudyReels.reel02, caption: 'Campaign' },
-      { type: 'image', url: getHorizontalPhoto(2), caption: 'Assets' },
-      { type: 'image', url: getHorizontalPhoto(3), caption: 'Distribution' },
+    outcome:
+      '500K+ views, 35K+ likes, 8K+ shares, and measurable impact on national political mobilization.',
+    heroImage: getHorizontalPhoto(0),
+    mediaLayout: 'triple-vertical',
+    mediaReels: [
+      YT.verticalReels[2],
+      YT.verticalReels[3],
+      YT.verticalReels[4],
     ],
     relatedIds: ['2', '3'],
   },
@@ -79,18 +112,18 @@ export const caseStudies: CaseStudy[] = [
       { label: 'Ad Spend', value: '$0' },
       { label: 'Revenue Stream', value: 'Perpetual Revenue Stream Secured' },
     ],
-    problem: 'A mosque fundraising campaign with no paid budget, relying entirely on organic reach and community trust.',
+    problem:
+      'A mosque fundraising campaign with no paid budget, relying entirely on organic reach and community trust.',
     solution: [
       'Designed a story-led campaign that turned the cause into shareable, emotional content.',
       'Produced film and digital assets optimized for organic sharing and donations.',
       'Structured the funnel and messaging for clarity and conversion without paid media.',
     ],
-    outcome: '$250K raised in 4 weeks, 7,000%+ estimated ROI, $0 ad spend, and a perpetual revenue stream secured.',
-    assets: [
-      { type: 'video', url: YT.caseStudyReels.reel03, caption: 'Campaign film' },
-      { type: 'image', url: getHorizontalPhoto(0), caption: 'Campaign' },
-      { type: 'image', url: getHorizontalPhoto(1), caption: 'Donations' },
-    ],
+    outcome:
+      '$250K raised in 4 weeks, 7,000%+ estimated ROI, $0 ad spend, and a perpetual revenue stream secured.',
+    heroImage: getHorizontalPhoto(1),
+    mediaLayout: 'side-vertical',
+    mediaReels: [YT.verticalReels[10]],
     relatedIds: ['1', '3'],
   },
   {
@@ -104,17 +137,22 @@ export const caseStudies: CaseStudy[] = [
       { label: 'Revenue Generated', value: '$15,000+' },
       { label: 'Coverage', value: '5 Days of Continuous coverage' },
     ],
-    problem: 'An event with strong in-person impact but no system to capture attention and convert viewers into enrolled students.',
+    problem:
+      'An event with strong in-person impact but no system to capture attention and convert viewers into enrolled students.',
     solution: [
       'Treated the event as a media moment with full coverage and story-led content.',
       'Built an event-to-funnel system: content captured interest and drove sign-ups.',
       'Delivered 5 days of continuous coverage and repurposed into enrolment-focused assets.',
     ],
-    outcome: '400% increase in student enrolments, 200K+ views, $15K+ revenue, and a repeatable event-to-funnel model.',
-    assets: [
-      { type: 'video', url: YT.caseStudyReels.reel04, caption: 'Event coverage' },
-      { type: 'image', url: getHorizontalPhoto(2), caption: 'Event' },
-      { type: 'image', url: getHorizontalPhoto(3), caption: 'Social' },
+    outcome:
+      '400% increase in student enrolments, 200K+ views, $15K+ revenue, and a repeatable event-to-funnel model.',
+    heroImage: getHorizontalPhoto(2),
+    mediaLayout: 'horizontal-with-tour',
+    mediaReels: [YT.horizontalReels[0]],
+    tourPhotos: [
+      getHorizontalPhoto(0),
+      getHorizontalPhoto(1),
+      getHorizontalPhoto(3),
     ],
     relatedIds: ['1', '2'],
   },
