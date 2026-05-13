@@ -4,7 +4,12 @@
  */
 
 export const YT = {
-  heroBackground: 'https://youtu.be/uiZELAehGNM',
+  /**
+   * Hero background — direct MP4 from R2 `Vertical/landing page/`.
+   * HeroShowreel automatically detects this as non-YouTube and uses the
+   * native <video> element with autoplay/loop/muted.
+   */
+  heroBackground: 'https://media.aethon.au/Vertical/landing%20page/final%20aethon%20showreel.mp4',
   heroLoop: 'https://youtu.be/XIVQ-LYGflw',
   horizontalReels: [
     'https://youtu.be/XK_wiMNxfCE', // Elder promo uncaptioned
