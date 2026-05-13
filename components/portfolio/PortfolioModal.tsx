@@ -6,11 +6,8 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { PortfolioItem } from '@/data/portfolio'
 import { getPosterForItem } from '@/lib/portfolioPoster'
 import { isYouTubeUrl } from '@/lib/youtube'
+import { encodeMediaPath } from '@/lib/media/encodeMediaPath'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
-
-function encodePath(p: string): string {
-  return p.split('/').map((s) => encodeURIComponent(s)).join('/')
-}
 
 interface PortfolioModalProps {
   isOpen: boolean
@@ -67,7 +64,7 @@ export default function PortfolioModal({
     setPrefersReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
 
-  const src = item ? encodePath(item.src) : ''
+  const src = item ? encodeMediaPath(item.src) : ''
   const useYouTube = item ? isYouTubeUrl(item.src) : false
   const poster = item ? getPosterForItem(item) : ''
   const nextIndex = currentIndex < allItems.length - 1 ? currentIndex + 1 : 0
