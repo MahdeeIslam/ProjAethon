@@ -3,7 +3,11 @@
  * Combines horizontal + vertical reels with metadata from portfolioMeta.
  */
 
-import { getMetaForReel, type Pillar } from './portfolioMeta'
+import {
+  getMetaForReel,
+  type Pillar,
+  type PortfolioCategory,
+} from './portfolioMeta'
 
 export type PortfolioFormat = 'horizontal' | 'vertical'
 
@@ -11,6 +15,10 @@ export interface PortfolioItem {
   id: string
   title: string
   client: string
+  /** Short descriptor shown after the title — e.g. "Documentary", "Promo". */
+  type: string
+  /** Top-level grouping shown on the portfolio page (Film/Campaigns/Content). */
+  category: PortfolioCategory
   year: number
   pillar: Pillar
   format: PortfolioFormat
@@ -49,6 +57,8 @@ export function buildPortfolioItems(
       id: `h-${idx}`,
       title: meta.title,
       client: meta.client,
+      type: meta.type,
+      category: meta.category,
       year: meta.year,
       pillar: meta.pillar,
       format: 'horizontal',
@@ -67,6 +77,8 @@ export function buildPortfolioItems(
       id: `v-${idx}`,
       title: meta.title,
       client: meta.client,
+      type: meta.type,
+      category: meta.category,
       year: meta.year,
       pillar: meta.pillar,
       format: 'vertical',

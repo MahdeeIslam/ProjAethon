@@ -27,8 +27,7 @@ export default function PortfolioCard({ item, onClick }: PortfolioCardProps) {
   const isYt = isYouTubeUrl(item.src)
   const reel = useMemo(() => normalizeReelInput(item.src), [item.src])
   const src = isYt ? item.src : encodePath(item.src)
-  const tag = item.tags[0] ?? 'video'
-  const metric = item.metrics?.[0]
+  const isHorizontal = item.format === 'horizontal'
 
   useEffect(() => {
     setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -52,7 +51,6 @@ export default function PortfolioCard({ item, onClick }: PortfolioCardProps) {
   }, [isInView, reduceMotion])
 
   const showVideo = !reduceMotion && !videoFailed && isInView
-  const isHorizontal = item.format === 'horizontal'
 
   return (
     <article
@@ -60,83 +58,96 @@ export default function PortfolioCard({ item, onClick }: PortfolioCardProps) {
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={(e) => e.key === 'Enter' && onClick()}
-      className="group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] transition-all duration-300 hover:-translate-y-[2px] hover:border-[rgba(245,245,242,0.22)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)]"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+      aria-label={`${item.client} — ${item.title}`}
+      className={`group relative block w-full overflow-hidden rounded-[18px] border border-[rgba(245,245,242,0.10)] bg-obsidian transition-all duration-300 cursor-pointer hover:-translate-y-[2px] hover:border-[rgba(245,245,242,0.30)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bone/40 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${
+        isHorizontal ? 'aspect-video' : 'aspect-[9/16]'
+      }`}
     >
+      {/* Poster — always visible as base */}
       <div
-        className={`relative w-full shrink-0 overflow-hidden bg-obsidian ${
-          isHorizontal ? 'aspect-video' : 'aspect-[9/16]'
+        className={`absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-[1.03] ${
+          showVideo ? 'opacity-0' : 'opacity-100'
         }`}
-      >
-        {/* Poster - always visible as base */}
-        <div
-          className={`absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-[1.02] ${
-            showVideo ? 'opacity-0' : 'opacity-100'
-          }`}
-          style={{ backgroundImage: `url(${poster})` }}
-          aria-hidden
-        />
-        {/* Video - plays when in view */}
-        {isInView && (
-          <>
-            {!videoFailed && (
-              isYt ? (
-                <ReelSurface
-                  reel={reel}
-                  context="grid"
-                  title={item.title}
-                  autoplay
-                  muted
-                  loop
-                  reduceMotion={reduceMotion}
-                  mediaClassName={`transition-opacity duration-300 ${
-                    showVideo ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              ) : (
-                <video
-                  ref={videoRef}
-                  src={src}
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                  preload="metadata"
-                  poster={poster}
-                  onError={() => setVideoFailed(true)}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
-                    showVideo ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              )
-            )}
-            {videoFailed && (
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${poster})` }}
-                aria-hidden
-              />
-            )}
-          </>
-        )}
-        {/* Bottom gradient overlay */}
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"
-          aria-hidden
-        />
-      </div>
+        style={{ backgroundImage: `url(${poster})` }}
+        aria-hidden
+      />
 
-      <div className="flex flex-1 flex-col justify-end p-5 md:px-6 md:pb-6 md:pt-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-bone/75 line-clamp-1">
-          {item.client}
-        </p>
-        <h3 className="mt-1.5 line-clamp-2 text-lg font-bold tracking-tight text-bone md:text-xl">
-          {item.title}
-        </h3>
-        <p className="mt-1.5 text-xs uppercase tracking-wider text-bone/70 opacity-80">
-          {tag} · {item.year} · {item.format}
-          {metric && ` · ${metric.value}`}
-        </p>
+      {/* Video — plays when in view */}
+      {isInView && (
+        <>
+          {!videoFailed &&
+            (isYt ? (
+              <ReelSurface
+                reel={reel}
+                context="grid"
+                title={item.title}
+                autoplay
+                muted
+                loop
+                reduceMotion={reduceMotion}
+                mediaClassName={`transition-opacity duration-300 ${
+                  showVideo ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                src={src}
+                muted
+                loop
+                playsInline
+                autoPlay
+                preload="metadata"
+                poster={poster}
+                onError={() => setVideoFailed(true)}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+                  showVideo ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            ))}
+          {videoFailed && (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${poster})` }}
+              aria-hidden
+            />
+          )}
+        </>
+      )}
+
+      {/* Hover overlay — titling/details only visible on hover or focus */}
+      <div
+        className="pointer-events-none absolute inset-0 flex flex-col justify-end p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:opacity-100 md:p-6"
+        aria-hidden
+      >
+        {/* Reading gradient + slight dim to make text legible */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15"
+          aria-hidden
+        />
+        <div className="relative">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-bone/85 drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+            {item.client}
+          </p>
+          <h3 className="mt-2 text-lg font-bold leading-snug tracking-tight text-bone drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)] md:text-xl">
+            {item.title}
+            <span className="ml-2 text-base font-medium text-bone/70 md:text-lg">
+              — {item.type}
+            </span>
+          </h3>
+          <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.18em] text-bone/90">
+            View project
+            <span className="transition-transform duration-200 group-hover:translate-x-1">
+              →
+            </span>
+          </span>
+        </div>
       </div>
     </article>
   )

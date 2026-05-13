@@ -1,7 +1,14 @@
 'use client'
 
 import type { PortfolioItem } from '@/data/portfolio'
+import {
+  CATEGORY_LABELS,
+  CATEGORY_BLURBS,
+  CATEGORY_ORDER,
+  type PortfolioCategory,
+} from '@/data/portfolioMeta'
 import PortfolioCard from './PortfolioCard'
+import Reveal from '@/components/motion/Reveal'
 import RevealGroup from '@/components/motion/RevealGroup'
 import Container from '@/components/ui/Container'
 
@@ -10,10 +17,15 @@ interface PortfolioGridProps {
   onItemClick: (item: PortfolioItem, indexInFullList: number) => void
 }
 
-export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps) {
-  const horizontal = items.filter((i) => i.format === 'horizontal')
-  const vertical = items.filter((i) => i.format === 'vertical')
+/**
+ * Masonry layout via CSS multi-column. Each card breaks naturally
+ * inside a column; vertical (9:16) and horizontal (16:9) clips share
+ * the same column and pack tightly with no rigid rows.
+ */
+const MASONRY_CLASSES =
+  'columns-1 gap-5 sm:columns-2 lg:columns-3 lg:gap-6 [&>*]:break-inside-avoid [&>*]:mb-5 lg:[&>*]:mb-6'
 
+export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps) {
   if (items.length === 0) {
     return (
       <div className="py-20 text-center">
@@ -22,46 +34,60 @@ export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps
     )
   }
 
-  /** Real grid (not CSS columns) — equal column widths, aligned rows, predictable order. */
-  const gridClass =
-    'grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 [&>div]:min-h-0 [&>div]:h-full'
+  const byCategory: Record<PortfolioCategory, PortfolioItem[]> = {
+    film: [],
+    campaigns: [],
+    content: [],
+  }
+  for (const item of items) {
+    byCategory[item.category].push(item)
+  }
 
   return (
-    <section id="portfolio-grid" className="scroll-mt-24 pt-14 pb-24 md:pt-16 md:pb-28">
+    <section
+      id="portfolio-grid"
+      className="scroll-mt-24 bg-obsidian pt-16 pb-24 md:pt-20 md:pb-28"
+      aria-label="Portfolio work, grouped by category"
+    >
       <Container wide>
-        {horizontal.length > 0 && (
-          <div className="mb-16 md:mb-20">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-bone/55">
-              Landscape · 16:9
-            </p>
-            <RevealGroup stagger={0.05} delay={0} className={gridClass}>
-              {horizontal.map((item) => (
-                <PortfolioCard
-                  key={item.id}
-                  item={item}
-                  onClick={() => onItemClick(item, items.indexOf(item))}
-                />
-              ))}
-            </RevealGroup>
-          </div>
-        )}
+        {CATEGORY_ORDER.map((category, sectionIdx) => {
+          const list = byCategory[category]
+          if (list.length === 0) return null
 
-        {vertical.length > 0 && (
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-bone/55">
-              Portrait · 9:16
-            </p>
-            <RevealGroup stagger={0.05} delay={0} className={gridClass}>
-              {vertical.map((item) => (
-                <PortfolioCard
-                  key={item.id}
-                  item={item}
-                  onClick={() => onItemClick(item, items.indexOf(item))}
-                />
-              ))}
-            </RevealGroup>
-          </div>
-        )}
+          return (
+            <div
+              key={category}
+              className={sectionIdx > 0 ? 'mt-20 md:mt-24' : ''}
+            >
+              <Reveal>
+                <div className="mb-8 flex flex-col gap-2 md:mb-10 md:flex-row md:items-end md:justify-between md:gap-8">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-bone/55">
+                      {String(sectionIdx + 1).padStart(2, '0')} ·{' '}
+                      {CATEGORY_LABELS[category]}
+                    </p>
+                    <h2 className="mt-2 text-3xl font-bold uppercase tracking-tight text-bone md:text-4xl lg:text-[2.5rem]">
+                      {CATEGORY_LABELS[category]}
+                    </h2>
+                  </div>
+                  <p className="max-w-sm text-sm text-bone/65 md:text-base">
+                    {CATEGORY_BLURBS[category]}
+                  </p>
+                </div>
+              </Reveal>
+
+              <RevealGroup stagger={0.05} delay={0} className={MASONRY_CLASSES}>
+                {list.map((item) => (
+                  <PortfolioCard
+                    key={item.id}
+                    item={item}
+                    onClick={() => onItemClick(item, items.indexOf(item))}
+                  />
+                ))}
+              </RevealGroup>
+            </div>
+          )
+        })}
       </Container>
     </section>
   )
