@@ -87,14 +87,11 @@ export default function FeaturedCaseStudiesModule() {
         <Reveal>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-bone/55">
-                Proof
-              </p>
-              <h2 className="mt-2 text-3xl font-bold uppercase tracking-tight text-bone md:text-4xl">
+              <h2 className="text-3xl font-bold uppercase tracking-tight text-bone md:text-4xl">
                 Featured case studies
               </h2>
               <p className="mt-2 text-base text-bone/75 max-w-lg">
-                Measured outcomes across distribution, growth, and revenue.
+                Results that speak for themselves.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-4 md:justify-end">
@@ -334,28 +331,7 @@ export default function FeaturedCaseStudiesModule() {
           </div>
         )}
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-8 md:gap-12 border-t border-[rgba(245,245,242,0.10)] py-6 min-h-[96px]">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-bone md:text-3xl">40M+</p>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-bone/60 mt-1">
-              Views generated
-            </p>
-          </div>
-          <div className="h-12 w-px bg-[rgba(245,245,242,0.12)]" />
-          <div className="text-center">
-            <p className="text-2xl font-bold text-bone md:text-3xl">$450k+</p>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-bone/60 mt-1">
-              Revenue influenced
-            </p>
-          </div>
-          <div className="h-12 w-px bg-[rgba(245,245,242,0.12)]" />
-          <div className="text-center">
-            <p className="text-2xl font-bold text-bone md:text-3xl">450+</p>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-bone/60 mt-1">
-              Clips delivered
-            </p>
-          </div>
-        </div>
+        <div className="pb-12 md:pb-16" />
       </Container>
     </section>
   )

@@ -19,14 +19,14 @@ export const LOGO_FALLBACKS = [
   '/logo.png',
 ]
 
-// Brand tagline (premium, minimal, museum vibe)
-export const BRAND_TAGLINE = 'Cinematic Ihsan'
-/** Hero / showreel tagline (e.g. "melbourne-based creative studio") */
+// Brand tagline (footer-ready, plain-English positioning)
+export const BRAND_TAGLINE = 'Creative production for organisations that take quality seriously.'
+/** Hero / showreel kicker (small uppercase line above the headline) */
 export const HERO_TAGLINE = 'melbourne-based creative studio'
 
 // SEO-ready brand description
 export const BRAND_DESCRIPTION =
-  'Premium Muslim community creative agency. Tier-1 cinematography with strict vocal-only/nasheed audio standard. Outsourced marketing department for institutions seeking excellence.'
+  'Full-service production, design, websites, and paid campaigns, run by people who understand your world. One agency, full capability.'
 
 // Site URL from environment variable (fallback for local development)
 export const SITE_URL =
@@ -36,10 +36,21 @@ export const SITE_URL =
 export const LOGO_URL = `${SITE_URL}${LOGO_PATH}`
 
 /** Public contact email (mailto:, footer, CTAs) */
-export const CONTACT_EMAIL = 'aethon2026@gmail.com'
+export const CONTACT_EMAIL = 'contact@aethon.au'
+
+/** Australian Business Number (footer / legal) */
+export const CONTACT_ABN = '82 794 788 291'
 
 // Primary CTA text (single source of truth)
-export const PRIMARY_CTA = 'Request a Strategic Consultation'
+export const PRIMARY_CTA = 'Start a conversation'
 /** Hero section primary CTA */
 export const HERO_CTA = 'View Portfolio'
+
+/** Social profile links — replace `#` once handles are confirmed */
+export const SOCIAL_LINKS = {
+  instagram: 'https://www.instagram.com/aethon.au/',
+  tiktok: 'https://www.tiktok.com/@aethon.au',
+  facebook: 'https://www.facebook.com/aethon.au',
+  linkedin: 'https://www.linkedin.com/company/aethon-au/',
+} as const
 
