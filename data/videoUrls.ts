@@ -1,47 +1,51 @@
 /**
- * YouTube URLs for embedded video across the site.
- * Update here when you add or change videos.
+ * Single export of every video URL used by the site.
+ *
+ * All URLs point at Cloudflare R2 via `media.aethon.au`. No YouTube /
+ * external sources — to add or change a clip, update the filename
+ * arrays in `lib/media/remoteReels.ts` (the bucket source of truth).
  */
 
+import {
+  PUBLIC_HERO_BACKGROUND_URL,
+  PUBLIC_HORIZONTAL_REELS,
+  PUBLIC_VERTICAL_REELS,
+} from '@/lib/media/remoteReels'
+
+const horizontalReels = PUBLIC_HORIZONTAL_REELS
+const verticalReels = PUBLIC_VERTICAL_REELS
+
+// Pick stable indexes for the case study + portfolio slots. Falls back to
+// the first horizontal/vertical reel if the bucket ever shrinks below
+// the expected count.
+const pickH = (i: number) => horizontalReels[i] ?? horizontalReels[0]
+const pickV = (i: number) => verticalReels[i] ?? verticalReels[0]
+
 export const YT = {
+  /** Homepage hero background — the dedicated landing-page showreel. */
+  heroBackground: PUBLIC_HERO_BACKGROUND_URL,
   /**
-   * Hero background — direct MP4 from R2 `Vertical/landing page/`.
-   * HeroShowreel automatically detects this as non-YouTube and uses the
-   * native <video> element with autoplay/loop/muted.
+   * Soft fallback used elsewhere on the site if the hero clip can't load.
+   * Points at the most polished horizontal reel.
    */
-  heroBackground: 'https://media.aethon.au/Vertical/landing%20page/final%20aethon%20showreel.mp4',
-  heroLoop: 'https://youtu.be/XIVQ-LYGflw',
-  horizontalReels: [
-    'https://youtu.be/XK_wiMNxfCE', // Elder promo uncaptioned
-    'https://youtu.be/uiZELAehGNM', // Third Space teaser
-    // No separate UMMA link provided — reusing Elder promo until you add one
-    'https://youtu.be/XK_wiMNxfCE',
-    'https://youtu.be/KkKKx13q6Bc', // Moe vis client work
-    'https://youtu.be/hkDefsMzmqY', // Recap elder event ver 5
-  ],
-  verticalReels: [
-    'https://youtube.com/shorts/kTeN7EMQQeI?feature=share', // Musibah
-    'https://youtube.com/shorts/5g3Tz_ZICps?feature=share', // MVM Dr Mustafa V2
-    'https://youtube.com/shorts/Dcs18A4JFhc?feature=share', // MVM Gaza Updated V3
-    'https://youtube.com/shorts/nTfIrIHp23I?feature=share', // Ree#1 03
-    'https://youtube.com/shorts/22K2-0-fGMg?feature=share', // Reel#3 02
-    'https://youtube.com/shorts/nlPPQRuaABY?feature=share', // TAOFIQ STORY
-  ],
+  heroLoop: pickH(5), // Copy of Third Space Teaser 1
+  horizontalReels,
+  verticalReels,
   caseStudyReels: {
-    reel01: 'https://youtu.be/XK_wiMNxfCE',
-    reel02: 'https://youtu.be/KkKKx13q6Bc',
-    reel03: 'https://youtu.be/hkDefsMzmqY',
-    reel04: 'https://youtu.be/uiZELAehGNM',
-    reel05: 'https://youtu.be/XIVQ-LYGflw',
-    reel06: 'https://youtube.com/shorts/nlPPQRuaABY?feature=share',
+    reel01: pickH(4), // Elders promo
+    reel02: pickH(5), // Third Space Teaser
+    reel03: pickH(6), // UMMA promo
+    reel04: pickH(0), // Arabic Revival 360 Basketball Tournament
+    reel05: pickH(1), // DWF scene 1
+    reel06: pickH(2), // DWF scene 2
   },
   portfolioLegacy: {
-    portfolio1: 'https://youtu.be/XK_wiMNxfCE',
-    portfolio2: 'https://youtu.be/uiZELAehGNM',
-    portfolio3: 'https://youtu.be/KkKKx13q6Bc',
-    portfolio4: 'https://youtu.be/hkDefsMzmqY',
-    portfolio5: 'https://youtube.com/shorts/kTeN7EMQQeI?feature=share',
-    portfolio6: 'https://youtube.com/shorts/5g3Tz_ZICps?feature=share',
-    portfolio7: 'https://youtube.com/shorts/Dcs18A4JFhc?feature=share',
+    portfolio1: pickH(4), // Elders promo
+    portfolio2: pickH(5), // Third Space Teaser
+    portfolio3: pickH(6), // UMMA promo
+    portfolio4: pickH(2), // DWF scene 2
+    portfolio5: pickV(10), // Musibah
+    portfolio6: pickV(0), // BAHDON STORY
+    portfolio7: pickV(13), // TAOFIQ STORY V2
   },
 } as const

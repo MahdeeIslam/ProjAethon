@@ -10,12 +10,11 @@ import Reveal from '@/components/motion/Reveal'
 import RevealGroup from '@/components/motion/RevealGroup'
 import Container from '@/components/ui/Container'
 import { YT } from '@/data/videoUrls'
-import { filterLandscapeReelUrls } from '@/lib/youtube'
 import { normalizeReelInput } from '@/lib/media/normalizeReel'
 import ReelSurface from '@/components/media/ReelSurface'
 
 const HERO_CASE_STUDY_ID = '1'
-const FALLBACK_HORIZONTAL = YT.horizontalReels[0] ?? 'https://www.youtube.com/watch?v=REPLACE_ME'
+const FALLBACK_HORIZONTAL = YT.horizontalReels[0]
 
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
 
@@ -32,20 +31,14 @@ export default function FeaturedCaseStudiesModule() {
       .then((res) => res.json())
       .then((data: { paths: string[] }) => {
         const paths = Array.isArray(data.paths) ? data.paths : []
-        const merged = paths.length > 0 ? paths : [...YT.horizontalReels]
-        const filtered = filterLandscapeReelUrls(merged)
-        setHorizontalPaths(
-          filtered.length > 0 ? filtered : filterLandscapeReelUrls([...YT.horizontalReels])
-        )
+        setHorizontalPaths(paths.length > 0 ? paths : [...YT.horizontalReels])
       })
-      .catch(() => setHorizontalPaths(filterLandscapeReelUrls([...YT.horizontalReels])))
+      .catch(() => setHorizontalPaths([...YT.horizontalReels]))
   }, [])
 
   const basePool = useMemo(() => {
     const merged = horizontalPaths.length > 0 ? horizontalPaths : [...YT.horizontalReels]
-    const filtered = filterLandscapeReelUrls(merged)
-    const base = filtered.length > 0 ? filtered : filterLandscapeReelUrls([...YT.horizontalReels])
-    return [...base].sort((a, b) => a.localeCompare(b))
+    return [...merged].sort((a, b) => a.localeCompare(b))
   }, [horizontalPaths])
 
   const [shuffledPool, setShuffledPool] = useState<string[] | null>(null)

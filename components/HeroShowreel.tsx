@@ -8,12 +8,7 @@ import { HERO_TAGLINE, HERO_CTA, BRAND_WORDMARK } from '@/lib/brand'
 
 import { HERO_PHOTO } from '@/data/placeholderPhotos'
 import { YT } from '@/data/videoUrls'
-import { isYouTubeUrl } from '@/lib/youtube'
-import { normalizeReelInput } from '@/lib/media/normalizeReel'
-import ReelSurface from '@/components/media/ReelSurface'
 
-const HERO_VIDEO_FALLBACK = YT.heroLoop
-const HERO_VIDEO_FALLBACK2 = YT.heroLoop
 const HERO_POSTER = HERO_PHOTO
 
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
@@ -29,20 +24,18 @@ const MOTION_DELAYS = { eyebrow: 0, headline: 150, subtext: 300, buttons: 450, m
 export default function HeroShowreel() {
   const [audioEnabled, setAudioEnabled] = useState(false)
   const [showPoster, setShowPoster] = useState(true)
-  const [videoSrc, setVideoSrc] = useState<string>(() => YT.heroBackground)
+  const [videoFailed, setVideoFailed] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
   const [parallaxY, setParallaxY] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
+  const videoSrc = YT.heroBackground
+
   useEffect(() => {
     if (videoRef.current) videoRef.current.muted = !audioEnabled
   }, [audioEnabled])
-
-  useEffect(() => {
-    setVideoSrc(YT.heroBackground)
-  }, [YT.heroBackground])
 
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -71,18 +64,9 @@ export default function HeroShowreel() {
   }, [reduceMotion])
 
   const onCanPlay = () => setShowPoster(false)
-
-  const onVideoError = () => {
-    if (videoSrc === YT.heroBackground) setVideoSrc(HERO_VIDEO_FALLBACK)
-    else if (videoSrc === HERO_VIDEO_FALLBACK) setVideoSrc(HERO_VIDEO_FALLBACK2)
-  }
+  const onVideoError = () => setVideoFailed(true)
 
   const show = reduceMotion || mounted
-  const useYouTube = isYouTubeUrl(videoSrc)
-  const heroReel = normalizeReelInput(videoSrc)
-  useEffect(() => {
-    if (useYouTube) setShowPoster(false)
-  }, [useYouTube])
 
   return (
     <section
@@ -95,23 +79,11 @@ export default function HeroShowreel() {
         className="absolute inset-0 z-0 transition-transform duration-100 ease-out"
         style={{ transform: `translateY(${parallaxY * 0.5}px)` }}
       >
-        {useYouTube ? (
-          <ReelSurface
-            key={videoSrc}
-            reel={heroReel}
-            context="hero"
-            title="Aethon hero background"
-            autoplay
-            muted={!audioEnabled}
-            loop
-            showControls={false}
-            reduceMotion={false}
-            priority
-            mediaClassName="opacity-[0.75] transition-transform duration-700 ease-out motion-reduce:transition-none group-hover/hero:scale-[1.02]"
-          />
-        ) : (
+        {!videoFailed && (
           <video
             ref={videoRef}
+            key={videoSrc}
+            src={videoSrc}
             autoPlay
             loop
             playsInline
@@ -120,15 +92,25 @@ export default function HeroShowreel() {
             poster={HERO_POSTER}
             onCanPlay={onCanPlay}
             onError={onVideoError}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.85] transition-transform duration-700 ease-out motion-reduce:transition-none group-hover/hero:scale-[1.02]"
             style={{ filter: 'saturate(1.08) contrast(1.05) brightness(0.92)' }}
             aria-hidden
-          >
-            <source src={videoSrc} type="video/mp4" />
-          </video>
+          />
         )}
-        {showPoster && (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d2a28] to-[#1f1c1a]" aria-hidden />
+        {(showPoster || videoFailed) && (
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d2a28] to-[#1f1c1a]"
+            aria-hidden
+            style={
+              videoFailed
+                ? {
+                    backgroundImage: `url(${HERO_POSTER})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }
+                : undefined
+            }
+          />
         )}
       </div>
 
