@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import Reveal from '@/components/motion/Reveal'
+import { CONTACT_EMAIL } from '@/lib/brand'
 
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
 
@@ -14,10 +15,25 @@ const BUDGET_OPTIONS = [
 ]
 
 const inputBase =
-  'w-full rounded-xl border border-bone/20 bg-[rgba(255,255,255,0.03)] px-4 py-3.5 text-bone placeholder:text-bone/40 transition-colors duration-200 focus:border-bone/50 focus:outline-none focus:ring-2 focus:ring-bone/20 focus:ring-offset-2 focus:ring-offset-obsidian hover:border-bone/30'
+  'w-full rounded-xl border border-bone/20 bg-[rgba(255,255,255,0.03)] px-4 py-3.5 text-bone placeholder:text-bone/40 transition-colors duration-200 focus:border-bone/50 focus:outline-none focus:ring-2 focus:ring-bone/20 focus:ring-offset-2 focus:ring-offset-obsidian hover:border-bone/30 disabled:cursor-not-allowed disabled:opacity-60'
+
+type Status = 'idle' | 'submitting' | 'success' | 'error'
+
+const ERROR_MESSAGES: Record<string, string> = {
+  invalid: 'Please check the form fields and try again.',
+  config:
+    "We couldn't send your message right now. Please email us directly — we'll respond personally.",
+  provider:
+    'Our email service is having a hiccup. Please try again in a few minutes.',
+  unknown:
+    'Something went wrong on our end. Please try again or email us directly.',
+  network:
+    "We couldn't reach our server. Please check your connection and try again.",
+}
 
 export default function Contact() {
-  const [submitted, setSubmitted] = useState(false)
+  const [status, setStatus] = useState<Status>('idle')
+  const [errorKey, setErrorKey] = useState<string>('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formData, setFormData] = useState({
     name: '',
@@ -26,6 +42,8 @@ export default function Contact() {
     budgetRange: '',
     goals: '',
     message: '',
+    // honeypot — never shown to humans
+    company_website: '',
   })
 
   const validate = () => {
@@ -38,16 +56,46 @@ export default function Contact() {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
-    setSubmitted(true)
+
+    setStatus('submitting')
+    setErrorKey('')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      const data: { ok?: boolean; error?: string } = await res
+        .json()
+        .catch(() => ({}))
+
+      if (res.ok && data.ok) {
+        setStatus('success')
+        return
+      }
+
+      setErrorKey(data.error && ERROR_MESSAGES[data.error] ? data.error : 'unknown')
+      setStatus('error')
+    } catch {
+      setErrorKey('network')
+      setStatus('error')
+    }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
     if (errors[e.target.name]) setErrors((prev) => ({ ...prev, [e.target.name]: '' }))
+    if (status === 'error') setStatus('idle')
   }
+
+  const isSubmitting = status === 'submitting'
 
   return (
     <div className="relative min-h-screen bg-obsidian">
@@ -56,7 +104,8 @@ export default function Contact() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)',
+            background:
+              'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)',
           }}
           aria-hidden
         />
@@ -68,7 +117,8 @@ export default function Contact() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(ellipse 80% 60% at 50% 20%, transparent 40%, rgba(0,0,0,0.35) 100%)',
+            background:
+              'radial-gradient(ellipse 80% 60% at 50% 20%, transparent 40%, rgba(0,0,0,0.35) 100%)',
           }}
           aria-hidden
         />
@@ -88,23 +138,8 @@ export default function Contact() {
             </p>
           </Reveal>
 
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              href="#form"
-              className="inline-flex items-center justify-center rounded-xl border-2 border-bone bg-bone px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-obsidian transition-all duration-200 hover:-translate-y-0.5 hover:bg-bone hover:shadow-[0_0_24px_rgba(245,245,242,0.2)] focus:outline-none focus:ring-2 focus:ring-bone/40 focus:ring-offset-2 focus:ring-offset-obsidian"
-            >
-              Start a project
-            </Link>
-            <a
-              href="#"
-              className="inline-flex items-center justify-center rounded-xl border-2 border-bone/40 px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-bone transition-colors hover:border-bone/60 hover:text-bone focus:outline-none focus:ring-2 focus:ring-bone/30 focus:ring-offset-2 focus:ring-offset-obsidian"
-            >
-              Book a call
-            </a>
-          </div>
-
           <div className="mt-14 border-t border-bone/15 pt-12">
-            {submitted ? (
+            {status === 'success' ? (
               <Reveal>
                 <div
                   role="status"
@@ -112,7 +147,17 @@ export default function Contact() {
                   className="rounded-2xl border border-bone/20 bg-[rgba(255,255,255,0.04)] p-10 text-center"
                 >
                   <p className="text-lg font-medium text-bone">
-                    Thank you. We&apos;ll be in touch soon.
+                    Thank you — your message is on its way. We&apos;ll be in touch shortly.
+                  </p>
+                  <p className="mt-4 text-sm text-bone/65">
+                    If you need a faster reply, email{' '}
+                    <a
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="text-bone underline-offset-4 hover:underline"
+                    >
+                      {CONTACT_EMAIL}
+                    </a>
+                    .
                   </p>
                 </div>
               </Reveal>
@@ -126,7 +171,10 @@ export default function Contact() {
                 >
                   <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70">
+                      <label
+                        htmlFor="name"
+                        className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70"
+                      >
                         Name *
                       </label>
                       <input
@@ -134,6 +182,7 @@ export default function Contact() {
                         type="text"
                         name="name"
                         required
+                        disabled={isSubmitting}
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Your name"
@@ -144,7 +193,10 @@ export default function Contact() {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70">
+                      <label
+                        htmlFor="email"
+                        className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70"
+                      >
                         Email *
                       </label>
                       <input
@@ -152,6 +204,7 @@ export default function Contact() {
                         type="email"
                         name="email"
                         required
+                        disabled={isSubmitting}
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="you@example.com"
@@ -164,13 +217,17 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="organisation" className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70">
+                    <label
+                      htmlFor="organisation"
+                      className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70"
+                    >
                       Organisation
                     </label>
                     <input
                       id="organisation"
                       type="text"
                       name="organisation"
+                      disabled={isSubmitting}
                       value={formData.organisation}
                       onChange={handleChange}
                       placeholder="Company or organisation"
@@ -179,12 +236,16 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="budgetRange" className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70">
+                    <label
+                      htmlFor="budgetRange"
+                      className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70"
+                    >
                       Budget range
                     </label>
                     <select
                       id="budgetRange"
                       name="budgetRange"
+                      disabled={isSubmitting}
                       value={formData.budgetRange}
                       onChange={handleChange}
                       className={`${inputBase} appearance-none bg-[rgba(255,255,255,0.03)] pr-10`}
@@ -203,13 +264,17 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="goals" className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70">
+                    <label
+                      htmlFor="goals"
+                      className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70"
+                    >
                       Goals
                     </label>
                     <input
                       id="goals"
                       type="text"
                       name="goals"
+                      disabled={isSubmitting}
                       value={formData.goals}
                       onChange={handleChange}
                       placeholder="What do you want to achieve?"
@@ -218,7 +283,10 @@ export default function Contact() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="message" className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70">
+                    <label
+                      htmlFor="message"
+                      className="block text-xs font-semibold uppercase tracking-[0.14em] text-bone/70"
+                    >
                       Message *
                     </label>
                     <textarea
@@ -226,6 +294,7 @@ export default function Contact() {
                       name="message"
                       required
                       rows={5}
+                      disabled={isSubmitting}
                       value={formData.message}
                       onChange={handleChange}
                       placeholder="Tell us about your project..."
@@ -236,12 +305,59 @@ export default function Contact() {
                     )}
                   </div>
 
-                  <button
-                    type="submit"
-                    className="rounded-xl border-2 border-bone bg-bone px-10 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-obsidian transition-all duration-200 hover:-translate-y-0.5 hover:bg-bone hover:shadow-[0_0_24px_rgba(245,245,242,0.2)] focus:outline-none focus:ring-2 focus:ring-bone/40 focus:ring-offset-2 focus:ring-offset-obsidian"
+                  {/* Honeypot — hidden from humans, catches naive bots */}
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: '-10000px',
+                      width: '1px',
+                      height: '1px',
+                      overflow: 'hidden',
+                    }}
                   >
-                    Send
-                  </button>
+                    <label htmlFor="company_website">Company website</label>
+                    <input
+                      id="company_website"
+                      type="text"
+                      name="company_website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={formData.company_website}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  {status === 'error' && (
+                    <div
+                      role="alert"
+                      className="rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200"
+                    >
+                      {ERROR_MESSAGES[errorKey] ?? ERROR_MESSAGES.unknown}{' '}
+                      <a
+                        href={`mailto:${CONTACT_EMAIL}`}
+                        className="font-medium text-red-100 underline-offset-4 hover:underline"
+                      >
+                        {CONTACT_EMAIL}
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-5">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="inline-flex items-center justify-center rounded-full border border-bone/70 bg-white/[0.06] px-9 h-12 text-sm font-semibold uppercase tracking-[0.14em] text-bone backdrop-blur-md transition-all duration-300 hover:bg-white/[0.14] hover:border-bone hover:-translate-y-0.5 hover:shadow-[0_0_28px_rgba(245,245,242,0.22)] focus:outline-none focus:ring-2 focus:ring-bone/50 focus:ring-offset-2 focus:ring-offset-obsidian disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0 disabled:hover:bg-white/[0.06]"
+                    >
+                      {isSubmitting ? 'Sending…' : 'Send message'}
+                    </button>
+                    <Link
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="text-sm font-medium uppercase tracking-wider text-bone/75 transition-colors hover:text-bone border-b border-transparent hover:border-bone/50"
+                    >
+                      Or email us directly
+                    </Link>
+                  </div>
                 </form>
               </Reveal>
             )}

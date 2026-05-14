@@ -242,8 +242,17 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
      - `reels/Vertical/TAOFIQ STORY V2.mp4`
    - If not set, app falls back to local `/public/placeholders/...` reels in development.
 
-3. **Other variables** (optional):
-   - Contact form email service keys
+3. **Contact form (Resend)** — required to send emails from `/contact`:
+   ```bash
+   RESEND_API_KEY=re_xxx_your_key
+   # optional: override the destination inbox
+   # CONTACT_EMAIL_TO=contact@aethon.au
+   # optional: change the "From:" address (must be a verified Resend sender)
+   # CONTACT_EMAIL_FROM=Aethon <hello@aethon.au>
+   ```
+   See *"4. Contact Form (Resend)"* below for full setup steps.
+
+4. **Other variables** (optional):
    - Analytics IDs
    - API keys
 
@@ -263,13 +272,52 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    - Place `/public/og-image.jpg` (1200x630px)
    - URL is automatically generated from `NEXT_PUBLIC_SITE_URL`
 
-### 4. Integrate Contact Form
+### 4. Contact Form (Resend)
 
-The contact form in `app/contact/page.tsx` currently logs to console. Integrate with:
+The contact form at `/contact` POSTs to the `app/api/contact/route.ts` API
+route, which sends the submission as an email via [Resend](https://resend.com).
+Destination defaults to `CONTACT_EMAIL` in `lib/brand.ts` (`contact@aethon.au`).
 
-- **Email Service**: SendGrid, Resend, or similar
-- **Form Handler**: Formspree, Netlify Forms, or custom API route
-- **CRM**: HubSpot, Salesforce, etc.
+#### One-time setup
+
+1. **Create a Resend account** at https://resend.com using
+   `contact@aethon.au` (free tier covers 3,000 emails/month, 100/day).
+2. **Generate an API key** in Resend → *API Keys* → *Create API Key*
+   (Sending access is enough). Copy the `re_...` value.
+3. **Add it to Vercel** → Project → *Settings* → *Environment Variables*:
+   - `RESEND_API_KEY` = `re_xxx...` (all environments)
+4. **Redeploy** the project (Vercel → Deployments → ⋯ → Redeploy) so the
+   new env var is picked up.
+
+That's it — submissions will land in `contact@aethon.au`.
+
+#### Optional env vars
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `CONTACT_EMAIL_TO` | Override where messages are delivered | `CONTACT_EMAIL` from `lib/brand.ts` |
+| `CONTACT_EMAIL_FROM` | The `From:` address shown in the inbox | `Aethon Website <onboarding@resend.dev>` |
+
+#### Upgrading to a branded `From:` address (recommended later)
+
+Out of the box, Resend allows sending from `onboarding@resend.dev` without any
+DNS work — emails will arrive at `contact@aethon.au` immediately. Once you're
+ready to send from a branded address (`hello@aethon.au` etc.):
+
+1. In Resend → *Domains* → *Add Domain* → enter `aethon.au`.
+2. Add the SPF / DKIM TXT records it shows you to Cloudflare DNS.
+3. Wait for verification (usually under 10 minutes).
+4. In Vercel, set `CONTACT_EMAIL_FROM=Aethon <hello@aethon.au>` and redeploy.
+
+The form will then send from your own domain.
+
+#### Spam protection
+
+- Hidden honeypot field (`company_website`) silently drops bot submissions.
+- All fields are length-capped and HTML-escaped before being rendered into
+  the email template.
+- Replies in your inbox go directly to the visitor (`Reply-To` is set to
+  whatever email they entered).
 
 ### 5. Add Calendly Integration
 
@@ -370,7 +418,7 @@ Private - All rights reserved
 
 ## Support
 
-For questions or issues, contact: aethon2026@gmail.com (see `CONTACT_EMAIL` in `lib/brand.ts`)
+For questions or issues, contact: contact@aethon.au (see `CONTACT_EMAIL` in `lib/brand.ts`)
 
 ---
 
