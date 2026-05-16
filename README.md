@@ -263,10 +263,7 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    - All URLs are automatically generated from this variable
 
 2. **Contact Information**:
-   - Set public email in `lib/brand.ts` (`CONTACT_EMAIL`; used by Footer, portfolio mailto links, etc.)
-   - Update phone in:
-     - `components/Footer.tsx`
-     - `app/contact/page.tsx`
+   - Set the public inbox in `lib/brand.ts` (`CONTACT_EMAIL`). This is used for mailto links **and** as the default `To:` address for the `/contact` form (via Resend). Use `contact@aethon.au`, `contact@aethon.com`, or whichever mailbox you actually monitor — one constant drives both.
 
 3. **OpenGraph Image**:
    - Place `/public/og-image.jpg` (1200x630px)
@@ -276,7 +273,10 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
 
 The contact form at `/contact` POSTs to the `app/api/contact/route.ts` API
 route, which sends the submission as an email via [Resend](https://resend.com).
-Destination defaults to `CONTACT_EMAIL` in `lib/brand.ts` (`contact@aethon.au`).
+Destination is **`CONTACT_EMAIL`** in `lib/brand.ts` (currently `contact@aethon.au`).
+Optional `CONTACT_EMAIL_TO` overrides that inbox only if it looks like a valid
+email address; blank or invalid values are ignored so mis-typed env vars never
+swallow submissions.
 
 #### One-time setup
 
@@ -295,7 +295,7 @@ That's it — submissions will land in `contact@aethon.au`.
 
 | Variable | Purpose | Default |
 |---|---|---|
-| `CONTACT_EMAIL_TO` | Override where messages are delivered | `CONTACT_EMAIL` from `lib/brand.ts` |
+| `CONTACT_EMAIL_TO` | Override where messages are delivered (must be a valid email) | `CONTACT_EMAIL` from `lib/brand.ts` |
 | `CONTACT_EMAIL_FROM` | The `From:` address shown in the inbox | `Aethon Website <onboarding@resend.dev>` |
 
 #### Upgrading to a branded `From:` address (recommended later)

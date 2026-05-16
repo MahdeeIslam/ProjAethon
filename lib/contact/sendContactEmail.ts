@@ -11,9 +11,9 @@
  *                            without verifying a domain. Once the
  *                            aethon.au domain is verified in Resend,
  *                            switch this to e.g. 'contact@aethon.au'.
- *   - CONTACT_EMAIL_TO      (optional) — override destination. Defaults
- *                            to `CONTACT_EMAIL` from `lib/brand.ts`
- *                            (contact@aethon.au).
+ *   - CONTACT_EMAIL_TO      (optional) — override destination inbox. Must be
+ *                            a valid email if set; otherwise messages go to
+ *                            `CONTACT_EMAIL` in `lib/brand.ts` (contact@aethon.au).
  */
 
 import { Resend } from 'resend'
@@ -35,6 +35,20 @@ export interface SendResult {
 }
 
 const DEFAULT_FROM = 'Aethon Website <onboarding@resend.dev>'
+
+function isValidEmailAddress(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+/**
+ * Where Resend delivers the message. `CONTACT_EMAIL_TO` may point at a
+ * staging inbox; invalid or empty values fall back to `CONTACT_EMAIL`.
+ */
+function resolveDeliveryInbox(): string {
+  const override = process.env.CONTACT_EMAIL_TO?.trim()
+  if (override && isValidEmailAddress(override)) return override
+  return CONTACT_EMAIL
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -122,19 +136,20 @@ export async function sendContactEmail(
   }
 
   const from = process.env.CONTACT_EMAIL_FROM || DEFAULT_FROM
-  const to = process.env.CONTACT_EMAIL_TO || CONTACT_EMAIL
+  const to = resolveDeliveryInbox()
 
   try {
     const resend = new Resend(apiKey)
     const result = await resend.emails.send({
       from,
-      to,
+      to: [to],
       replyTo: payload.email,
       subject: `New enquiry — ${payload.name}${
         payload.organisation ? ` (${payload.organisation})` : ''
       }`,
       html: renderHtml(payload),
       text: renderText(payload),
+      tags: [{ name: 'source', value: 'contact_form' }],
     })
 
     if (result.error) {

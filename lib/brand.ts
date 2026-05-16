@@ -35,7 +35,11 @@ export const SITE_URL =
 // Logo URL (absolute)
 export const LOGO_URL = `${SITE_URL}${LOGO_PATH}`
 
-/** Public contact email (mailto:, footer, CTAs) */
+/**
+ * Public contact email (mailto:, footer, CTAs) and the default inbox for
+ * contact-form submissions sent via Resend (`/api/contact`).
+ * Override delivery only with `CONTACT_EMAIL_TO` in server env if needed.
+ */
 export const CONTACT_EMAIL = 'contact@aethon.au'
 
 /** Australian Business Number (footer / legal) */

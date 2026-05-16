@@ -343,6 +343,11 @@ export default function Contact() {
                     </div>
                   )}
 
+                  <p className="text-[11px] leading-relaxed text-bone/50">
+                    Submissions are sent securely to{' '}
+                    <span className="font-medium text-bone/70">{CONTACT_EMAIL}</span>.
+                  </p>
+
                   <div className="flex flex-wrap items-center gap-5">
                     <button
                       type="submit"
