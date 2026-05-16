@@ -1,19 +1,17 @@
 /**
- * Server-only helper that turns a validated contact-form payload into
- * an email and ships it via Resend.
+ * Server-only helper: contact form → inbox.
+ *
+ * 1. **Resend** (preferred when `RESEND_API_KEY` is set)
+ * 2. **FormSubmit** (fallback) — POSTs to `formsubmit.co/ajax/<inbox>` so the
+ *    form still works on Vercel before Resend is wired. No extra env vars.
  *
  * Configuration (Vercel env vars):
- *   - RESEND_API_KEY        (required) — sign up at https://resend.com,
- *                            free tier is 3,000 emails / month.
- *   - CONTACT_EMAIL_FROM    (optional) — the "from" address. Defaults to
- *                            'Aethon Website <onboarding@resend.dev>',
- *                            which Resend allows out-of-the-box even
- *                            without verifying a domain. Once the
- *                            aethon.au domain is verified in Resend,
- *                            switch this to e.g. 'contact@aethon.au'.
- *   - CONTACT_EMAIL_TO      (optional) — override destination inbox. Must be
- *                            a valid email if set; otherwise messages go to
- *                            `CONTACT_EMAIL` in `lib/brand.ts` (contact@aethon.au).
+ *   - RESEND_API_KEY        (optional but recommended) — https://resend.com
+ *   - CONTACT_EMAIL_FROM    (optional) — Resend `from`. Defaults to
+ *                            `Aethon Website <onboarding@resend.dev>`.
+ *   - CONTACT_EMAIL_TO      (optional) — override destination inbox; must be
+ *                            a valid email or it is ignored in favour of
+ *                            `CONTACT_EMAIL` from `lib/brand.ts`.
  */
 
 import { Resend } from 'resend'
@@ -31,7 +29,7 @@ export interface ContactPayload {
 export interface SendResult {
   ok: boolean
   /** Stable, user-safe error code. Never leaks API details. */
-  error?: 'config' | 'invalid' | 'provider' | 'unknown'
+  error?: 'invalid' | 'provider' | 'unknown'
 }
 
 const DEFAULT_FROM = 'Aethon Website <onboarding@resend.dev>'
@@ -41,8 +39,7 @@ function isValidEmailAddress(value: string): boolean {
 }
 
 /**
- * Where Resend delivers the message. `CONTACT_EMAIL_TO` may point at a
- * staging inbox; invalid or empty values fall back to `CONTACT_EMAIL`.
+ * Delivery inbox. `CONTACT_EMAIL_TO` overrides only when valid.
  */
 function resolveDeliveryInbox(): string {
   const override = process.env.CONTACT_EMAIL_TO?.trim()
@@ -118,48 +115,112 @@ function renderText(p: ContactPayload): string {
   return lines.join('\n')
 }
 
+/**
+ * FormSubmit relay — no API key. First use may require confirming the
+ * address in the FormSubmit email; see https://formsubmit.co/
+ */
+async function sendViaFormSubmit(
+  payload: ContactPayload,
+  to: string
+): Promise<boolean> {
+  const endpoint = `https://formsubmit.co/ajax/${encodeURIComponent(to)}`
+  const subject = `New enquiry — ${payload.name}${
+    payload.organisation ? ` (${payload.organisation})` : ''
+  }`
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        name: payload.name,
+        email: payload.email,
+        _subject: subject,
+        organisation: payload.organisation ?? '',
+        budget: payload.budgetRange ?? '',
+        goals: payload.goals ?? '',
+        message: payload.message,
+        _captcha: false,
+      }),
+    })
+
+    const raw = await res.text()
+    let data: { success?: string | boolean; message?: string } | null = null
+    try {
+      data = JSON.parse(raw) as { success?: string | boolean; message?: string }
+    } catch {
+      /* non-JSON body */
+    }
+
+    const ok =
+      res.ok &&
+      data != null &&
+      (data.success === true || data.success === 'true')
+
+    if (!ok) {
+      console.error('[contact] FormSubmit:', res.status, raw.slice(0, 500))
+    }
+    return ok
+  } catch (err) {
+    console.error('[contact] FormSubmit fetch error:', err)
+    return false
+  }
+}
+
+async function sendViaResend(
+  payload: ContactPayload,
+  apiKey: string,
+  to: string
+): Promise<boolean> {
+  const from = process.env.CONTACT_EMAIL_FROM || DEFAULT_FROM
+  const resend = new Resend(apiKey)
+  const result = await resend.emails.send({
+    from,
+    to: [to],
+    replyTo: payload.email,
+    subject: `New enquiry — ${payload.name}${
+      payload.organisation ? ` (${payload.organisation})` : ''
+    }`,
+    html: renderHtml(payload),
+    text: renderText(payload),
+    tags: [{ name: 'source', value: 'contact_form' }],
+  })
+
+  if (result.error) {
+    console.error('[contact] Resend error:', result.error)
+    return false
+  }
+  return true
+}
+
 export async function sendContactEmail(
   payload: ContactPayload
 ): Promise<SendResult> {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(
-        '[contact] RESEND_API_KEY is not set — contact email cannot be delivered.'
-      )
-    }
-    return { ok: false, error: 'config' }
-  }
-
   if (!payload.name.trim() || !payload.email.trim() || !payload.message.trim()) {
     return { ok: false, error: 'invalid' }
   }
 
-  const from = process.env.CONTACT_EMAIL_FROM || DEFAULT_FROM
   const to = resolveDeliveryInbox()
+  const apiKey = process.env.RESEND_API_KEY?.trim()
 
-  try {
-    const resend = new Resend(apiKey)
-    const result = await resend.emails.send({
-      from,
-      to: [to],
-      replyTo: payload.email,
-      subject: `New enquiry — ${payload.name}${
-        payload.organisation ? ` (${payload.organisation})` : ''
-      }`,
-      html: renderHtml(payload),
-      text: renderText(payload),
-      tags: [{ name: 'source', value: 'contact_form' }],
-    })
-
-    if (result.error) {
-      console.error('[contact] Resend error:', result.error)
-      return { ok: false, error: 'provider' }
+  if (apiKey) {
+    try {
+      const ok = await sendViaResend(payload, apiKey, to)
+      if (ok) return { ok: true }
+    } catch (err) {
+      console.error('[contact] Resend exception:', err)
     }
-
-    return { ok: true }
-  } catch (err) {
-    console.error('[contact] Unexpected send error:', err)
-    return { ok: false, error: 'unknown' }
+  } else if (process.env.NODE_ENV !== 'production') {
+    console.warn(
+      '[contact] RESEND_API_KEY is not set — trying FormSubmit fallback.'
+    )
   }
+
+  const fallbackOk = await sendViaFormSubmit(payload, to)
+  if (fallbackOk) return { ok: true }
+
+  return { ok: false, error: 'provider' }
 }

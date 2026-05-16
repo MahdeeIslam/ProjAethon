@@ -21,10 +21,8 @@ type Status = 'idle' | 'submitting' | 'success' | 'error'
 
 const ERROR_MESSAGES: Record<string, string> = {
   invalid: 'Please check the form fields and try again.',
-  config:
-    "We couldn't send your message right now. Please email us directly — we'll respond personally.",
   provider:
-    'Our email service is having a hiccup. Please try again in a few minutes.',
+    'We could not deliver your message through our form just now. Please try again in a few minutes, or use "Or email us directly" below.',
   unknown:
     'Something went wrong on our end. Please try again or email us directly.',
   network:

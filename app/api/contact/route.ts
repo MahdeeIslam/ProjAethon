@@ -61,7 +61,7 @@ export async function POST(request: Request) {
   const result = await sendContactEmail(payload)
 
   if (!result.ok) {
-    const status = result.error === 'config' ? 503 : 502
+    const status = 502
     return NextResponse.json({ ok: false, error: result.error }, { status })
   }
 

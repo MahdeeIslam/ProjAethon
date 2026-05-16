@@ -40,7 +40,7 @@ export const LOGO_URL = `${SITE_URL}${LOGO_PATH}`
  * contact-form submissions sent via Resend (`/api/contact`).
  * Override delivery only with `CONTACT_EMAIL_TO` in server env if needed.
  */
-export const CONTACT_EMAIL = 'contact@aethon.au'
+export const CONTACT_EMAIL = 'contact@aethon.com'
 
 /** Australian Business Number (footer / legal) */
 export const CONTACT_ABN = '82 794 788 291'
