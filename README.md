@@ -242,17 +242,19 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
      - `reels/Vertical/TAOFIQ STORY V2.mp4`
    - If not set, app falls back to local `/public/placeholders/...` reels in development.
 
-3. **Contact form** — **Resend** (recommended) + automatic **FormSubmit** fallback:
+3. **Contact form** — **Resend** (recommended) + **Web3Forms** + **FormSubmit**:
    ```bash
    RESEND_API_KEY=re_xxx_your_key
+   # Reliable fallback when Resend fails or isn't set yet (receiver set in Web3Forms UI)
+   # WEB3FORMS_ACCESS_KEY=your_access_key_from_web3forms.com
    # optional: override the destination inbox
    # CONTACT_EMAIL_TO=contact@aethon.au
    # optional: change the "From:" address (must be a verified Resend sender)
    # CONTACT_EMAIL_FROM=Aethon <hello@aethon.au>
    ```
-   If `RESEND_API_KEY` is missing or Resend errors, the server relays the same
-   payload via [FormSubmit](https://formsubmit.co/) to `CONTACT_EMAIL` so the
-   form still works on first deploy. See *"4. Contact Form"* below.
+   If Resend is missing or fails, the server tries [Web3Forms](https://web3forms.com/)
+   (`WEB3FORMS_ACCESS_KEY`), then [FormSubmit](https://formsubmit.co/)
+   (AJAX + classic POST) to `CONTACT_EMAIL`. See *"4. Contact Form"* below.
 
 4. **Other variables** (optional):
    - Analytics IDs
@@ -265,7 +267,7 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    - All URLs are automatically generated from this variable
 
 2. **Contact Information**:
-   - Set the public inbox in `lib/brand.ts` (`CONTACT_EMAIL`, currently `contact@aethon.au`). This drives mailto links site-wide **and** the default delivery address for `/contact` (Resend + FormSubmit fallback).
+   - Set the public inbox in `lib/brand.ts` (`CONTACT_EMAIL`, currently `contact@aethon.au`). This drives mailto links site-wide **and** the default delivery address for `/contact` (Resend → Web3Forms → FormSubmit).
 
 3. **OpenGraph Image**:
    - Place `/public/og-image.jpg` (1200x630px)
@@ -296,16 +298,17 @@ it once, then messages flow through.
 4. **Redeploy** the project (Vercel → Deployments → ⋯ → Redeploy) so the
    new env var is picked up.
 
-With Resend configured, submissions use your branded pipeline first; FormSubmit
-only runs if Resend is unavailable.
+With Resend configured, submissions use your branded pipeline first; Web3Forms
+and FormSubmit run only when Resend is unavailable.
 
-Without `RESEND_API_KEY`, the FormSubmit path still delivers to `contact@aethon.au`
-as long as FormSubmit’s service is reachable from Vercel.
+If you skip Resend entirely, **`WEB3FORMS_ACCESS_KEY`** is strongly recommended:
+FormSubmit alone can timeout or fail from some datacentre egress IPs.
 
 #### Optional env vars
 
 | Variable | Purpose | Default |
 |---|---|---|
+| `WEB3FORMS_ACCESS_KEY` | Web3Forms access key ([web3forms.com](https://web3forms.com)); receiver set in their UI | _(unset — FormSubmit only)_ |
 | `CONTACT_EMAIL_TO` | Override where messages are delivered (must be a valid email) | `CONTACT_EMAIL` from `lib/brand.ts` |
 | `CONTACT_EMAIL_FROM` | The `From:` address shown in the inbox | `Aethon Website <onboarding@resend.dev>` |
 

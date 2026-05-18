@@ -1,17 +1,22 @@
 /**
  * Server-only helper: contact form → inbox.
  *
- * 1. **Resend** (preferred when `RESEND_API_KEY` is set)
- * 2. **FormSubmit** (fallback) — POSTs to `formsubmit.co/ajax/<inbox>` so the
- *    form still works on Vercel before Resend is wired. No extra env vars.
+ * Tries providers in order until one succeeds:
+ *
+ * 1. **Resend** — when `RESEND_API_KEY` is set (recommended for production).
+ * 2. **Web3Forms** — when `WEB3FORMS_ACCESS_KEY` is set; reliable from
+ *    serverless IPs (FormSubmit often times out or errors from datacentres).
+ * 3. **FormSubmit** — JSON AJAX first, then classic URL-encoded POST (no API
+ *    key; first use may require activating the inbox at formsubmit.co).
  *
  * Configuration (Vercel env vars):
- *   - RESEND_API_KEY        (optional but recommended) — https://resend.com
- *   - CONTACT_EMAIL_FROM    (optional) — Resend `from`. Defaults to
- *                            `Aethon Website <onboarding@resend.dev>`.
- *   - CONTACT_EMAIL_TO      (optional) — override destination inbox; must be
- *                            a valid email or it is ignored in favour of
- *                            `CONTACT_EMAIL` from `lib/brand.ts`.
+ *   - RESEND_API_KEY         — https://resend.com
+ *   - WEB3FORMS_ACCESS_KEY   — https://web3forms.com (inbox set in their dashboard)
+ *   - CONTACT_EMAIL_FROM    — Resend `from`. Defaults to
+ *                             `Aethon Website <onboarding@resend.dev>`.
+ *   - CONTACT_EMAIL_TO      — override destination for Resend / FormSubmit;
+ *                             must be a valid email or it is ignored in favour of
+ *                             `CONTACT_EMAIL` from `lib/brand.ts`.
  */
 
 import { Resend } from 'resend'
@@ -115,18 +120,66 @@ function renderText(p: ContactPayload): string {
   return lines.join('\n')
 }
 
+function contactSubject(payload: ContactPayload): string {
+  return `New enquiry — ${payload.name}${
+    payload.organisation ? ` (${payload.organisation})` : ''
+  }`
+}
+
 /**
- * FormSubmit relay — no API key. First use may require confirming the
- * address in the FormSubmit email; see https://formsubmit.co/
+ * Web3Forms — access key from https://web3forms.com; receiving address is set in their UI.
  */
-async function sendViaFormSubmit(
+async function sendViaWeb3Forms(
+  payload: ContactPayload,
+  accessKey: string
+): Promise<boolean> {
+  const lines = [`Name: ${payload.name}`, `Email: ${payload.email}`]
+  if (payload.organisation) lines.push(`Organisation: ${payload.organisation}`)
+  if (payload.budgetRange) lines.push(`Budget: ${payload.budgetRange}`)
+  if (payload.goals) lines.push(`Goals: ${payload.goals}`)
+  lines.push('', 'Message:', payload.message)
+
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject: contactSubject(payload),
+        name: payload.name,
+        email: payload.email,
+        message: lines.join('\n'),
+        organisation: payload.organisation ?? '',
+        budget: payload.budgetRange ?? '',
+        goals: payload.goals ?? '',
+      }),
+    })
+
+    const raw = await res.text()
+    let data: { success?: boolean; message?: string } | null = null
+    try {
+      data = JSON.parse(raw) as { success?: boolean; message?: string }
+    } catch {
+      /* non-JSON */
+    }
+
+    const ok = res.ok && data?.success === true
+    if (!ok) {
+      console.error('[contact] Web3Forms:', res.status, raw.slice(0, 400))
+    }
+    return ok
+  } catch (err) {
+    console.error('[contact] Web3Forms fetch error:', err)
+    return false
+  }
+}
+
+async function sendViaFormSubmitAjax(
   payload: ContactPayload,
   to: string
 ): Promise<boolean> {
   const endpoint = `https://formsubmit.co/ajax/${encodeURIComponent(to)}`
-  const subject = `New enquiry — ${payload.name}${
-    payload.organisation ? ` (${payload.organisation})` : ''
-  }`
+  const subject = contactSubject(payload)
 
   try {
     const res = await fetch(endpoint, {
@@ -161,13 +214,68 @@ async function sendViaFormSubmit(
       (data.success === true || data.success === 'true')
 
     if (!ok) {
-      console.error('[contact] FormSubmit:', res.status, raw.slice(0, 500))
+      console.error('[contact] FormSubmit (ajax):', res.status, raw.slice(0, 500))
     }
     return ok
   } catch (err) {
-    console.error('[contact] FormSubmit fetch error:', err)
+    console.error('[contact] FormSubmit (ajax) fetch error:', err)
     return false
   }
+}
+
+/**
+ * Classic form POST — sometimes works when the AJAX endpoint fails from the edge.
+ */
+async function sendViaFormSubmitClassic(
+  payload: ContactPayload,
+  to: string
+): Promise<boolean> {
+  const subject = contactSubject(payload)
+  const endpoint = `https://formsubmit.co/${encodeURIComponent(to)}`
+
+  const params = new URLSearchParams()
+  params.set('name', payload.name)
+  params.set('email', payload.email)
+  params.set('_subject', subject)
+  params.set('message', payload.message)
+  if (payload.organisation) params.set('organisation', payload.organisation)
+  if (payload.budgetRange) params.set('budget', payload.budgetRange)
+  if (payload.goals) params.set('goals', payload.goals)
+  params.set('_captcha', 'false')
+
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'text/html,application/json;q=0.9,*/*;q=0.8',
+      },
+      body: params.toString(),
+      redirect: 'manual',
+    })
+
+    const ok =
+      res.status === 302 ||
+      res.status === 303 ||
+      (res.ok && res.status < 400)
+
+    if (!ok) {
+      const peek = await res.text().then((t) => t.slice(0, 400)).catch(() => '')
+      console.error('[contact] FormSubmit (classic):', res.status, peek)
+    }
+    return ok
+  } catch (err) {
+    console.error('[contact] FormSubmit (classic) fetch error:', err)
+    return false
+  }
+}
+
+async function sendViaFormSubmit(
+  payload: ContactPayload,
+  to: string
+): Promise<boolean> {
+  if (await sendViaFormSubmitAjax(payload, to)) return true
+  return sendViaFormSubmitClassic(payload, to)
 }
 
 async function sendViaResend(
@@ -205,6 +313,7 @@ export async function sendContactEmail(
 
   const to = resolveDeliveryInbox()
   const apiKey = process.env.RESEND_API_KEY?.trim()
+  const web3Key = process.env.WEB3FORMS_ACCESS_KEY?.trim()
 
   if (apiKey) {
     try {
@@ -215,8 +324,13 @@ export async function sendContactEmail(
     }
   } else if (process.env.NODE_ENV !== 'production') {
     console.warn(
-      '[contact] RESEND_API_KEY is not set — trying FormSubmit fallback.'
+      '[contact] RESEND_API_KEY is not set — trying Web3Forms / FormSubmit.'
     )
+  }
+
+  if (web3Key) {
+    const ok = await sendViaWeb3Forms(payload, web3Key)
+    if (ok) return { ok: true }
   }
 
   const fallbackOk = await sendViaFormSubmit(payload, to)
