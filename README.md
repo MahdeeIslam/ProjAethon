@@ -246,7 +246,7 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    ```bash
    RESEND_API_KEY=re_xxx_your_key
    # optional: override the destination inbox
-   # CONTACT_EMAIL_TO=contact@aethon.com
+   # CONTACT_EMAIL_TO=contact@aethon.au
    # optional: change the "From:" address (must be a verified Resend sender)
    # CONTACT_EMAIL_FROM=Aethon <hello@aethon.au>
    ```
@@ -265,7 +265,7 @@ Next.js automatically generates favicons from `app/icon.tsx`. For custom favicon
    - All URLs are automatically generated from this variable
 
 2. **Contact Information**:
-   - Set the public inbox in `lib/brand.ts` (`CONTACT_EMAIL`, currently `contact@aethon.com`). This drives mailto links site-wide **and** the default delivery address for `/contact` (Resend + FormSubmit fallback).
+   - Set the public inbox in `lib/brand.ts` (`CONTACT_EMAIL`, currently `contact@aethon.au`). This drives mailto links site-wide **and** the default delivery address for `/contact` (Resend + FormSubmit fallback).
 
 3. **OpenGraph Image**:
    - Place `/public/og-image.jpg` (1200x630px)
@@ -278,7 +278,7 @@ The contact form at `/contact` POSTs to `app/api/contact/route.ts`, which:
 1. Tries **[Resend](https://resend.com)** when `RESEND_API_KEY` is set (best deliverability, full HTML template).
 2. If the key is missing **or** Resend fails, automatically POSTs the same fields to **[FormSubmit](https://formsubmit.co/)** (`/ajax/<CONTACT_EMAIL>`), which forwards plain email to your inbox — **no extra env vars** for the fallback.
 
-Destination is **`CONTACT_EMAIL`** in `lib/brand.ts` (currently `contact@aethon.com`).
+Destination is **`CONTACT_EMAIL`** in `lib/brand.ts` (currently `contact@aethon.au`).
 Optional `CONTACT_EMAIL_TO` overrides that inbox only if it looks like a valid
 email address; blank or invalid values are ignored.
 
@@ -299,7 +299,7 @@ it once, then messages flow through.
 With Resend configured, submissions use your branded pipeline first; FormSubmit
 only runs if Resend is unavailable.
 
-Without `RESEND_API_KEY`, the FormSubmit path still delivers to `contact@aethon.com`
+Without `RESEND_API_KEY`, the FormSubmit path still delivers to `contact@aethon.au`
 as long as FormSubmit’s service is reachable from Vercel.
 
 #### Optional env vars
@@ -312,7 +312,7 @@ as long as FormSubmit’s service is reachable from Vercel.
 #### Upgrading to a branded `From:` address (recommended later)
 
 Out of the box, Resend allows sending from `onboarding@resend.dev` without any
-DNS work — messages arrive at `CONTACT_EMAIL` (e.g. `contact@aethon.com`) immediately. Once you're
+DNS work — messages arrive at `CONTACT_EMAIL` (e.g. `contact@aethon.au`) immediately. Once you're
 ready to send from a branded address (`hello@aethon.au` etc.):
 
 1. In Resend → *Domains* → *Add Domain* → enter `aethon.au`.
@@ -429,7 +429,7 @@ Private - All rights reserved
 
 ## Support
 
-For questions or issues, contact: contact@aethon.com (see `CONTACT_EMAIL` in `lib/brand.ts`)
+For questions or issues, contact: contact@aethon.au (see `CONTACT_EMAIL` in `lib/brand.ts`)
 
 ---
 
