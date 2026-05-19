@@ -4,6 +4,8 @@
  * Tries providers in order until one succeeds:
  *
  * 1. **Resend** — when `RESEND_API_KEY` is set (recommended for production).
+ *    Note: the `from` address must be on a domain verified in your Resend
+ *    account. Set CONTACT_EMAIL_FROM to e.g. `Aethon <noreply@aethon.au>`.
  * 2. **Web3Forms** — when `WEB3FORMS_ACCESS_KEY` is set; reliable from
  *    serverless IPs (FormSubmit often times out or errors from datacentres).
  * 3. **FormSubmit** — JSON AJAX first, then classic URL-encoded POST (no API
@@ -14,9 +16,8 @@
  *   - WEB3FORMS_ACCESS_KEY   — https://web3forms.com (inbox set in their dashboard)
  *   - CONTACT_EMAIL_FROM    — Resend `from`. Defaults to
  *                             `Aethon Website <onboarding@resend.dev>`.
- *   - CONTACT_EMAIL_TO      — override destination for Resend / FormSubmit;
- *                             must be a valid email or it is ignored in favour of
- *                             `CONTACT_EMAIL` from `lib/brand.ts`.
+ *
+ * Destination address: always `CONTACT_EMAIL` from `lib/brand.ts` (contact@aethon.au).
  */
 
 import { Resend } from 'resend'
@@ -39,16 +40,16 @@ export interface SendResult {
 
 const DEFAULT_FROM = 'Aethon Website <onboarding@resend.dev>'
 
-function isValidEmailAddress(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-}
-
 /**
- * Delivery inbox. `CONTACT_EMAIL_TO` overrides only when valid.
+ * Browser-like User-Agent. Node.js native fetch sends `User-Agent: node` by
+ * default, which Cloudflare's bot protection (used by web3forms.com and
+ * formsubmit.co) auto-blocks with a JS challenge interstitial. A real browser
+ * UA lets these requests through.
  */
+const BROWSER_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+
 function resolveDeliveryInbox(): string {
-  const override = process.env.CONTACT_EMAIL_TO?.trim()
-  if (override && isValidEmailAddress(override)) return override
   return CONTACT_EMAIL
 }
 
@@ -127,11 +128,14 @@ function contactSubject(payload: ContactPayload): string {
 }
 
 /**
- * Web3Forms — access key from https://web3forms.com; receiving address is set in their UI.
+ * Web3Forms — access key from https://web3forms.com.
+ * `to` in the body directs delivery to the correct inbox regardless of which
+ * email the access key was registered with.
  */
 async function sendViaWeb3Forms(
   payload: ContactPayload,
-  accessKey: string
+  accessKey: string,
+  to: string
 ): Promise<boolean> {
   const lines = [`Name: ${payload.name}`, `Email: ${payload.email}`]
   if (payload.organisation) lines.push(`Organisation: ${payload.organisation}`)
@@ -142,9 +146,14 @@ async function sendViaWeb3Forms(
   try {
     const res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'User-Agent': BROWSER_UA,
+      },
       body: JSON.stringify({
         access_key: accessKey,
+        to,
         subject: contactSubject(payload),
         name: payload.name,
         email: payload.email,
@@ -187,6 +196,7 @@ async function sendViaFormSubmitAjax(
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        'User-Agent': BROWSER_UA,
       },
       body: JSON.stringify({
         name: payload.name,
@@ -249,6 +259,7 @@ async function sendViaFormSubmitClassic(
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'text/html,application/json;q=0.9,*/*;q=0.8',
+        'User-Agent': BROWSER_UA,
       },
       body: params.toString(),
       redirect: 'manual',
@@ -329,7 +340,7 @@ export async function sendContactEmail(
   }
 
   if (web3Key) {
-    const ok = await sendViaWeb3Forms(payload, web3Key)
+    const ok = await sendViaWeb3Forms(payload, web3Key, to)
     if (ok) return { ok: true }
   }
 
