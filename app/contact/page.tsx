@@ -5,6 +5,20 @@ import Link from 'next/link'
 import Reveal from '@/components/motion/Reveal'
 import { CONTACT_EMAIL } from '@/lib/brand'
 
+/**
+ * Web3Forms access key (intentionally public — Web3Forms is browser-direct).
+ * Server-side calls to api.web3forms.com get blocked by Cloudflare's managed
+ * challenge (the same JS challenge blocks Vercel serverless egress and any
+ * non-browser client). Submitting from the real user's browser satisfies the
+ * challenge automatically and routes mail to contact@aethon.au via the key's
+ * destination configured at web3forms.com.
+ *
+ * Rotate at https://web3forms.com if abuse occurs.
+ */
+const WEB3FORMS_ACCESS_KEY =
+  process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY ||
+  '20314ee0-a846-444c-8d79-a83594f76671'
+
 const NOISE_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
 
 const BUDGET_OPTIONS = [
@@ -58,26 +72,62 @@ export default function Contact() {
     e.preventDefault()
     if (!validate()) return
 
+    // Honeypot — bots that fill `company_website` get a silent fake success
+    // so they don't retry. Real users never see this field.
+    if (formData.company_website.trim()) {
+      setStatus('success')
+      return
+    }
+
     setStatus('submitting')
     setErrorKey('')
 
+    const summary = [
+      `Name: ${formData.name}`,
+      `Email: ${formData.email}`,
+      formData.organisation && `Organisation: ${formData.organisation}`,
+      formData.budgetRange && `Budget: ${formData.budgetRange}`,
+      formData.goals && `Goals: ${formData.goals}`,
+      '',
+      'Message:',
+      formData.message,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `New enquiry — ${formData.name}${
+            formData.organisation ? ` (${formData.organisation})` : ''
+          }`,
+          from_name: formData.name,
+          replyto: formData.email,
+          name: formData.name,
+          email: formData.email,
+          organisation: formData.organisation,
+          budget: formData.budgetRange,
+          goals: formData.goals,
+          message: summary,
+        }),
       })
 
-      const data: { ok?: boolean; error?: string } = await res
+      const data: { success?: boolean; message?: string } = await res
         .json()
         .catch(() => ({}))
 
-      if (res.ok && data.ok) {
+      if (res.ok && data.success) {
         setStatus('success')
         return
       }
 
-      setErrorKey(data.error && ERROR_MESSAGES[data.error] ? data.error : 'unknown')
+      setErrorKey('provider')
       setStatus('error')
     } catch {
       setErrorKey('network')
