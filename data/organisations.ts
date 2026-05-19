@@ -1,18 +1,20 @@
 export interface Organisation {
-  id: string;
-  name: string;
-  logo: string; // Placeholder path - will be monochrome
+  id: string
+  name: string
+  logo: string
 }
 
 export const organisations: Organisation[] = [
-  { id: '1', name: 'Islamic School Network', logo: '/placeholders/logo-1.svg' },
-  { id: '2', name: 'Muslim Community Center', logo: '/placeholders/logo-2.svg' },
-  { id: '3', name: 'Community Foundation', logo: '/placeholders/logo-3.svg' },
-  { id: '4', name: 'Educational Trust', logo: '/placeholders/logo-4.svg' },
-  { id: '5', name: 'Islamic Foundation', logo: '/placeholders/logo-5.svg' },
-  { id: '6', name: 'Premium Educational Institution', logo: '/placeholders/logo-6.svg' },
-  { id: '7', name: 'Community Development Org', logo: '/placeholders/logo-7.svg' },
-  { id: '8', name: 'Educational Board', logo: '/placeholders/logo-8.svg' },
-  { id: '9', name: 'Pillars of Guidance Community Centre', logo: '/placeholders/logo-9.svg' },
-];
-
+  { id: 'amssa', name: 'AMSSA', logo: '/orgs/amssa.png' },
+  { id: 'ar360', name: 'Arabic Revival 360', logo: '/orgs/ar360.png' },
+  { id: 'iicsa', name: 'IICSA', logo: '/orgs/iicsa.png' },
+  { id: 'iraus', name: 'IRAUS', logo: '/orgs/iraus.png' },
+  { id: 'jbe', name: 'JBE', logo: '/orgs/jbe.png' },
+  { id: 'pgcc', name: 'Pillars of Guidance Community Centre', logo: '/orgs/pgcc.png' },
+  { id: 'strangers-studio', name: 'The Strangers Studio', logo: '/orgs/strangers-studio.png' },
+  { id: 'umma', name: 'UMMA', logo: '/orgs/umma.png' },
+  { id: 'wartaqi', name: 'Wartaqi', logo: '/orgs/wartaqi.png' },
+  { id: 'logo-01', name: 'Client', logo: '/orgs/logo-01.png' },
+  { id: 'white-logo', name: 'Client', logo: '/orgs/white-logo.png' },
+  { id: 'images-removebg', name: 'Client', logo: '/orgs/images-removebg.png' },
+]

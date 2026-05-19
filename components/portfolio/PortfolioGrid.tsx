@@ -2,10 +2,8 @@
 
 import type { PortfolioItem } from '@/data/portfolio'
 import {
-  CATEGORY_LABELS,
-  CATEGORY_BLURBS,
-  CATEGORY_ORDER,
-  type PortfolioCategory,
+  PILLAR_LABELS,
+  type Pillar,
 } from '@/data/portfolioMeta'
 import PortfolioCard from './PortfolioCard'
 import Reveal from '@/components/motion/Reveal'
@@ -25,6 +23,17 @@ interface PortfolioGridProps {
 const MASONRY_CLASSES =
   'columns-1 gap-5 sm:columns-2 lg:columns-3 lg:gap-6 [&>*]:break-inside-avoid [&>*]:mb-5 lg:[&>*]:mb-6'
 
+const PILLAR_ORDER: Pillar[] = ['institutions', 'narrative', 'digital']
+
+const PILLAR_BLURBS: Record<Pillar, string> = {
+  institutions:
+    'Civic, religious, and public-trust organisations whose work shapes communities.',
+  narrative:
+    'Long-form documentary, short film, and reflective stories built to be remembered.',
+  digital:
+    'Ongoing short-form, branded content, and digital presence work.',
+}
+
 export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps) {
   if (items.length === 0) {
     return (
@@ -34,13 +43,13 @@ export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps
     )
   }
 
-  const byCategory: Record<PortfolioCategory, PortfolioItem[]> = {
-    film: [],
-    campaigns: [],
-    content: [],
+  const byPillar: Record<Pillar, PortfolioItem[]> = {
+    institutions: [],
+    narrative: [],
+    digital: [],
   }
   for (const item of items) {
-    byCategory[item.category].push(item)
+    byPillar[item.pillar].push(item)
   }
 
   return (
@@ -50,28 +59,27 @@ export default function PortfolioGrid({ items, onItemClick }: PortfolioGridProps
       aria-label="Portfolio work, grouped by category"
     >
       <Container wide>
-        {CATEGORY_ORDER.map((category, sectionIdx) => {
-          const list = byCategory[category]
+        {PILLAR_ORDER.map((pillar, sectionIdx) => {
+          const list = byPillar[pillar]
           if (list.length === 0) return null
 
           return (
             <div
-              key={category}
+              key={pillar}
               className={sectionIdx > 0 ? 'mt-20 md:mt-24' : ''}
             >
               <Reveal>
                 <div className="mb-8 flex flex-col gap-2 md:mb-10 md:flex-row md:items-end md:justify-between md:gap-8">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-bone/55">
-                      {String(sectionIdx + 1).padStart(2, '0')} ·{' '}
-                      {CATEGORY_LABELS[category]}
+                      {String(sectionIdx + 1).padStart(2, '0')}
                     </p>
                     <h2 className="mt-2 text-3xl font-bold uppercase tracking-tight text-bone md:text-4xl lg:text-[2.5rem]">
-                      {CATEGORY_LABELS[category]}
+                      {PILLAR_LABELS[pillar]}
                     </h2>
                   </div>
                   <p className="max-w-sm text-sm text-bone/65 md:text-base">
-                    {CATEGORY_BLURBS[category]}
+                    {PILLAR_BLURBS[pillar]}
                   </p>
                 </div>
               </Reveal>

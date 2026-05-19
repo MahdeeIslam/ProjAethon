@@ -1,5 +1,3 @@
-import { getVerticalPhoto, HEADS_PHOTOS } from './placeholderPhotos'
-
 /**
  * Team data for About page.
  * `leadership: true` → top row (Nazif, Saad), shown with larger images.
@@ -23,38 +21,38 @@ export const team: TeamMember[] = [
     name: 'Nazif',
     role: 'Co-Founder & Brand Strategy Director',
     leadership: true,
-    image: HEADS_PHOTOS.nazif,
+    image: '/team/nazif.jpg',
   },
   {
     id: 'saad',
     name: 'Saad',
     role: 'Co-Founder & Creative Director',
     leadership: true,
-    image: HEADS_PHOTOS.saad,
+    image: '/team/saad.jpg',
     specialty: 'Creative execution, on-set direction, and film production.',
   },
   {
     id: 'nuoman',
     name: 'Nuoman',
     role: 'Paid Advertising Specialist',
-    image: getVerticalPhoto(6),
+    image: '/team/nuoman.jpg',
   },
   {
     id: 'labib',
     name: 'Labib',
     role: 'Visual Effects & Motion Designer',
-    image: getVerticalPhoto(2),
+    image: '/team/labib.jpg',
   },
   {
     id: 'yussuf',
     name: 'Yussuf',
     role: 'Lead Web Developer',
-    image: getVerticalPhoto(5),
+    image: '/team/yussuf.jpg',
   },
   {
     id: 'mahdee',
     name: 'Mahdee',
     role: 'Web Implementation Specialist',
-    image: getVerticalPhoto(3),
+    image: '/team/mahdee.jpg',
   },
 ]
