@@ -6,3 +6,6 @@ node_modules/
 # Local-only placeholder videos (often exceed GitHub’s 100MB limit). Keep files on disk for dev; do not commit.
 public/placeholders/**/*.mp4
 public/placeholders/**/*.MP4
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo
