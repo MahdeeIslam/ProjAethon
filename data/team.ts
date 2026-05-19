@@ -2,27 +2,59 @@ import { getVerticalPhoto, HEADS_PHOTOS } from './placeholderPhotos'
 
 /**
  * Team data for About page.
- * First row: leadership (slightly larger). Second row: specialists.
- * Uses vertical placeholder photos from placeholders/photos/vertical/.
+ * `leadership: true` → top row (Nazif, Saad), shown with larger images.
+ * Everyone else sits in a second row with smaller images.
  */
 
 export interface TeamMember {
   id: string
   name: string
   role: string
-  /** One-line specialty for profile cards */
+  /** Italic one-liner shown under leadership profiles only. Omit to hide. */
   specialty?: string
-  /** Leadership row (Saad, Nazif, Barisa) shown larger */
+  /** Leadership row shown larger and separated from specialists. */
   leadership?: boolean
   image?: string
 }
 
 export const team: TeamMember[] = [
-  { id: 'saad', name: 'Saad', role: 'Creative Director', leadership: true, image: HEADS_PHOTOS.saad, specialty: 'Direction, narrative, and production leadership.' },
-  { id: 'nazif', name: 'Nazif', role: 'Operations Manager', leadership: true, image: HEADS_PHOTOS.nazif, specialty: 'Systems, delivery, and client operations.' },
-  { id: 'mahdee', name: 'Mahdee', role: 'Digital Systems Lead', leadership: true, image: getVerticalPhoto(3), specialty: 'Web systems, performance, and implementation.' },
-  { id: 'labib', name: 'Labib', role: 'Client Strategy', leadership: false, image: getVerticalPhoto(2), specialty: 'Client strategy, discovery, and account momentum.' },
-  { id: 'munzfx', name: 'Munzfx', role: 'Graphics Designer', leadership: false, image: getVerticalPhoto(4), specialty: 'Identity, layout, and visual consistency.' },
-  { id: 'moeslave', name: 'Moe.slave', role: 'Motion Graphics Specialist', leadership: false, image: getVerticalPhoto(5), specialty: 'Reels, motion systems, editing cadence.' },
-  { id: 'numan', name: 'Numan', role: 'Ad-Strategy Specialist', leadership: false, image: getVerticalPhoto(6), specialty: 'Distribution, targeting, and conversion.' },
+  {
+    id: 'nazif',
+    name: 'Nazif',
+    role: 'Co-Founder & Brand Strategy Director',
+    leadership: true,
+    image: HEADS_PHOTOS.nazif,
+  },
+  {
+    id: 'saad',
+    name: 'Saad',
+    role: 'Co-Founder & Creative Director',
+    leadership: true,
+    image: HEADS_PHOTOS.saad,
+    specialty: 'Creative execution, on-set direction, and film production.',
+  },
+  {
+    id: 'nuoman',
+    name: 'Nuoman',
+    role: 'Paid Advertising Specialist',
+    image: getVerticalPhoto(6),
+  },
+  {
+    id: 'labib',
+    name: 'Labib',
+    role: 'Visual Effects & Motion Designer',
+    image: getVerticalPhoto(2),
+  },
+  {
+    id: 'yussuf',
+    name: 'Yussuf',
+    role: 'Lead Web Developer',
+    image: getVerticalPhoto(5),
+  },
+  {
+    id: 'mahdee',
+    name: 'Mahdee',
+    role: 'Web Implementation Specialist',
+    image: getVerticalPhoto(3),
+  },
 ]
