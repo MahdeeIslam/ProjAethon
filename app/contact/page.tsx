@@ -96,34 +96,86 @@ export default function Contact() {
       .join('\n')
 
     try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `New enquiry — ${formData.name}${
-            formData.organisation ? ` (${formData.organisation})` : ''
-          }`,
-          from_name: formData.name,
-          replyto: formData.email,
-          name: formData.name,
-          email: formData.email,
-          organisation: formData.organisation,
-          budget: formData.budgetRange,
-          goals: formData.goals,
-          message: summary,
-        }),
-      })
+      const web3Body = {
+        access_key: WEB3FORMS_ACCESS_KEY,
+        // Explicit `to` so delivery goes to our inbox regardless of which
+        // address the access key is registered to in the Web3Forms dashboard.
+        to: CONTACT_EMAIL,
+        subject: `New enquiry — ${formData.name}${
+          formData.organisation ? ` (${formData.organisation})` : ''
+        }`,
+        from_name: formData.name,
+        replyto: formData.email,
+        name: formData.name,
+        email: formData.email,
+        organisation: formData.organisation,
+        budget: formData.budgetRange,
+        goals: formData.goals,
+        message: summary,
+      }
 
-      const data: { success?: boolean; message?: string } = await res
-        .json()
-        .catch(() => ({}))
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(web3Body),
+        })
 
-      if (res.ok && data.success) {
-        setStatus('success')
+        const data: { success?: boolean; message?: string } = await res
+          .json()
+          .catch(() => ({}))
+
+        if (res.ok && data.success) {
+          setStatus('success')
+          return
+        }
+      } catch {
+        /* fall through to FormSubmit fallback */
+      }
+
+      // Web3Forms failed (or dashboard sends to wrong inbox). Fall back to
+      // FormSubmit which puts the destination in the URL — guaranteed delivery
+      // to contact@aethon.au regardless of any provider-dashboard config.
+      try {
+        const fsRes = await fetch(
+          `https://formsubmit.co/ajax/${encodeURIComponent(CONTACT_EMAIL)}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({
+              name: formData.name,
+              email: formData.email,
+              _subject: web3Body.subject,
+              organisation: formData.organisation,
+              budget: formData.budgetRange,
+              goals: formData.goals,
+              message: summary,
+              _captcha: 'false',
+              _replyto: formData.email,
+            }),
+          }
+        )
+
+        const fsData: { success?: string | boolean; message?: string } = await fsRes
+          .json()
+          .catch(() => ({}))
+
+        if (
+          fsRes.ok &&
+          (fsData.success === true || fsData.success === 'true')
+        ) {
+          setStatus('success')
+          return
+        }
+      } catch {
+        setErrorKey('network')
+        setStatus('error')
         return
       }
 
