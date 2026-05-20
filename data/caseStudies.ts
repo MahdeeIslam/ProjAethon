@@ -17,9 +17,6 @@
  * index card *and* the top-of-page banner on each detail view.
  */
 
-import { getHorizontalPhoto } from './placeholderPhotos'
-import { YT } from './videoUrls'
-
 export type CaseStudyMediaLayout =
   | 'triple-vertical'
   | 'side-vertical'
@@ -99,7 +96,7 @@ export const caseStudies: CaseStudy[] = [
       '/videos/case-studies/mvm-first.mp4',
       '/videos/case-studies/mvm-gaza.mp4',
     ],
-    relatedIds: ['2', '4'],
+    relatedIds: ['2', '3'],
   },
   {
     id: '2',
@@ -124,7 +121,7 @@ export const caseStudies: CaseStudy[] = [
     heroImage: '/case-studies/vmm-thumb.jpg',
     mediaLayout: 'side-vertical',
     mediaReels: ['/videos/case-studies/vmm.mp4'],
-    relatedIds: ['1', '5'],
+    relatedIds: ['1', '3'],
   },
   {
     id: '3',
@@ -154,98 +151,7 @@ export const caseStudies: CaseStudy[] = [
       '/case-studies/ar360-tour-2.jpg',
       '/case-studies/ar360-tour-3.jpg',
     ],
-    relatedIds: ['6', '4'],
-  },
-  {
-    id: '4',
-    slug: 'fairdinkum-podcast-25m-views',
-    title: 'From Ground Zero to 25 Million Views',
-    client: 'FairDinkum Podcast',
-    atAGlance: [
-      { label: 'Total Views Generated', value: '25.47M' },
-      { label: 'Total Followers Gained', value: '83.7K' },
-      { label: 'Episodes Recorded', value: '250+' },
-      { label: 'Platforms', value: 'YouTube · Instagram · TikTok' },
-    ],
-    problem:
-      'In 2020, FairDinkum Podcast started at ground zero: no audience and no platform. The challenge was two-fold — a lack of authentic, long-form content for the Australian Muslim community, and the difficulty of converting casual social media scrollers into a loyal community.',
-    solution: [
-      'Short-Form Engine: Dissected podcasts into high-impact snippets for TikTok and Reels, engineered for debate and shareability to dominate the "For You" page.',
-      'Search-Centric Discovery: Overhauled YouTube metadata to rank for global searches, pulling in passive viewers 24/7.',
-      'Visual Authority: Optimised visual presence with cinematic thumbnails and a cohesive brand aesthetic, significantly increasing CTR and perceived quality.',
-    ],
-    outcome:
-      'Over six years, FairDinkum Podcast grew into a staple of the Australian Muslim digital space, amassing over 25 million views across multiple platforms. The strategy proved that you don’t need to be a major media company to have massive impact — you just need to be authentic and strategic about how you share your voice.',
-    heroImage: getHorizontalPhoto(3),
-    mediaLayout: 'horizontal-with-tour',
-    mediaReels: [YT.horizontalReels[1] ?? YT.horizontalReels[0]],
-    tourPhotos: [
-      getHorizontalPhoto(1),
-      getHorizontalPhoto(2),
-      getHorizontalPhoto(0),
-    ],
-    relatedIds: ['5', '1'],
-  },
-  {
-    id: '5',
-    slug: 'onedeen-global-storytelling-platform',
-    title: 'A Global Storytelling Platform Reaching Millions',
-    client: 'OneDeen',
-    atAGlance: [
-      { label: 'Total Views Generated', value: '14M+' },
-      { label: 'Total Followers Gained', value: '108,000+' },
-      { label: 'Clips Recorded', value: '180+' },
-      { label: 'Platforms', value: 'Instagram · TikTok' },
-    ],
-    problem:
-      'When OneDeen launched, it entered an overcrowded social media environment dominated by recycled lecture clips, low-quality visuals, and content that struggled to connect with a lack of authenticity. The aim was to change the narrative by capturing emotionally compelling, short-form Islamic storytelling and motivational content.',
-    solution: [
-      'Street-interview storytelling format optimised for retention.',
-      'Aggressive short-form publishing cadence.',
-      'Emotionally driven interviews.',
-      'Platform-optimised video structure to maximise watch time.',
-    ],
-    outcome:
-      'AETHON transformed OneDeen from a zero-audience startup into a globally known short-form Islamic media platform generating 14 million+ views. This case study proves that with the right strategy, execution, and understanding of modern content, niche media brands can achieve massive global reach organically.',
-    heroImage: getHorizontalPhoto(2),
-    mediaLayout: 'triple-vertical',
-    mediaReels: [
-      YT.verticalReels[5] ?? YT.verticalReels[0],
-      YT.verticalReels[6] ?? YT.verticalReels[1],
-      YT.verticalReels[7] ?? YT.verticalReels[2],
-    ],
-    relatedIds: ['4', '6'],
-  },
-  {
-    id: '6',
-    slug: 'al-haramain-travels-umrah-brand',
-    title: 'Scaling Al-Haramain Travels into a High-Demand Umrah Brand',
-    client: 'Al-Haramain Travels',
-    atAGlance: [
-      { label: 'Total Views Generated', value: '1.1M+' },
-      { label: 'Revenue Gained', value: '$200,000+' },
-      { label: 'Clips Recorded', value: '25+' },
-      { label: 'Platforms', value: 'Instagram · TikTok' },
-    ],
-    problem:
-      'Al-Haramain Travels operates in one of the most trust-sensitive and competitive markets: Islamic pilgrimage travel. Despite offering high-quality Umrah packages, they faced limited digital authority and visibility in a highly competitive market with minimal brand differentiation.',
-    solution: [
-      'Trust-Driven Content Strategy: Emotionally driven content including cinematic Umrah visual storytelling and educational content about the Umrah journey.',
-      'Short-Form Distribution & Algorithmic Reach: Platform-optimised vertical video strategy.',
-      'High-retention editing structure designed for travel and pilgrimage decision-making.',
-    ],
-    outcome:
-      'Through strategic execution, Al-Haramain Travels experienced significant digital growth and brand authority expansion. This resulted in higher engagement on social media and an increase in ticket purchases — transitioning the company from a traditional travel provider into a digitally authoritative Islamic travel brand.',
-    keyOutcomes: [
-      'Thousands of organic impressions generated',
-      'Thousands of prospective pilgrims reached',
-      'Significant increase in brand awareness and digital trust',
-      'Strong inbound interest from prospective Umrah travelers',
-    ],
-    heroImage: getHorizontalPhoto(1),
-    mediaLayout: 'side-vertical',
-    mediaReels: [YT.verticalReels[8] ?? YT.verticalReels[0]],
-    relatedIds: ['3', '5'],
+    relatedIds: ['1', '2'],
   },
 ]
 
