@@ -216,9 +216,7 @@ export default function HeroShowreel() {
         </Container>
       </div>
 
-      {/* Bottom gradient — keeps the hero's bottom edge legible without
-          tinting to bone (next section is dark, not light, since we
-          unified the page tone in the Metropolis-pin layout). */}
+      {/* Bottom gradient — clean fade into the dark obsidian content below. */}
       <div
         className="absolute bottom-0 left-0 right-0 h-[100px] pointer-events-none z-[3] md:h-[120px]"
         style={{
@@ -227,38 +225,6 @@ export default function HeroShowreel() {
         }}
         aria-hidden
       />
-
-      {/* Full-bleed AETHON wordmark — anchored to the very bottom of the
-          hero, the way Metropolis sits their logo across the bottom edge.
-          Opacity dialed back so it acts as an architectural element rather
-          than a competing display headline (the showreel video itself
-          already contains AETHON brand frames). */}
-      <div
-        className="pointer-events-none absolute bottom-2 left-0 right-0 z-[4] flex justify-between px-6 md:bottom-3 md:px-10 lg:px-12"
-        aria-hidden
-        style={{
-          opacity: show ? 0.55 : 0,
-          transform: show ? 'translateY(0)' : 'translateY(12px)',
-          transition: reduceMotion
-            ? 'none'
-            : `opacity 1s ease-out 600ms, transform 1s ease-out 600ms`,
-        }}
-      >
-        {Array.from('AETHON').map((char, i) => (
-          <span
-            key={i}
-            className="text-bone font-bold leading-[0.85] uppercase select-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]"
-            style={{
-              fontSize: 'clamp(2.75rem, 14vw, 13rem)',
-              letterSpacing: '-0.04em',
-              fontFamily:
-                "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            }}
-          >
-            {char}
-          </span>
-        ))}
-      </div>
     </section>
   )
 }
