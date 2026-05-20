@@ -164,9 +164,9 @@ export default function HeroShowreel() {
 
             {/* Headline — client-approved positioning */}
             <h1
-              className="font-bold uppercase leading-[0.94] tracking-[-0.025em] text-bone drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]"
+              className="font-bold uppercase leading-[0.96] tracking-[-0.02em] text-bone drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]"
               style={{
-                fontSize: 'clamp(2.25rem, 7.1vw, 7.25rem)',
+                fontSize: 'clamp(2rem, 5.6vw, 5.5rem)',
                 textShadow: '0 0 56px rgba(0,0,0,0.45)',
                 opacity: show ? 1 : 0,
                 transform: show ? 'translateY(0)' : 'translateY(20px)',
@@ -211,37 +211,34 @@ export default function HeroShowreel() {
               >
                 {HERO_CTA}
               </Link>
-              <Link
-                href="/case-studies"
-                className="group/link inline-flex w-fit items-center gap-1 text-sm font-medium tracking-wider text-bone/90 hover:text-bone border-b border-transparent hover:border-bone/60 transition-colors drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
-              >
-                Read case studies
-                <span className="inline-block transition-transform duration-200 group-hover/link:translate-x-1">→</span>
-              </Link>
             </div>
           </div>
         </Container>
       </div>
 
-      {/* Transition into next section — softer blend */}
+      {/* Bottom gradient — keeps the hero's bottom edge legible without
+          tinting to bone (next section is dark, not light, since we
+          unified the page tone in the Metropolis-pin layout). */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[120px] pointer-events-none z-[3] md:h-[140px]"
+        className="absolute bottom-0 left-0 right-0 h-[100px] pointer-events-none z-[3] md:h-[120px]"
         style={{
           background:
-            'linear-gradient(to bottom, transparent 0%, rgba(26,26,26,0.45) 35%, rgba(74,72,68,0.85) 72%, #d8d4cd 92%, #ebe9e4 100%)',
+            'linear-gradient(to bottom, transparent 0%, rgba(15,15,15,0.5) 50%, rgba(10,10,10,0.92) 100%)',
         }}
         aria-hidden
       />
 
-      {/* Full-bleed AETHON wordmark — spans the entire bottom of the hero,
-          letter-spaced edge-to-edge in the Metropolis manner.
-          Sits above the transition gradient but below the floating controls. */}
+      {/* Full-bleed AETHON wordmark — anchored to the very bottom of the
+          hero, the way Metropolis sits their logo across the bottom edge.
+          Opacity dialed back so it acts as an architectural element rather
+          than a competing display headline (the showreel video itself
+          already contains AETHON brand frames). */}
       <div
-        className="pointer-events-none absolute bottom-[18%] left-0 right-0 z-[4] flex justify-between px-6 md:bottom-[20%] md:px-10 lg:px-12"
+        className="pointer-events-none absolute bottom-2 left-0 right-0 z-[4] flex justify-between px-6 md:bottom-3 md:px-10 lg:px-12"
         aria-hidden
         style={{
-          opacity: show ? 0.92 : 0,
-          transform: show ? 'translateY(0)' : 'translateY(20px)',
+          opacity: show ? 0.55 : 0,
+          transform: show ? 'translateY(0)' : 'translateY(12px)',
           transition: reduceMotion
             ? 'none'
             : `opacity 1s ease-out 600ms, transform 1s ease-out 600ms`,
@@ -250,9 +247,9 @@ export default function HeroShowreel() {
         {Array.from('AETHON').map((char, i) => (
           <span
             key={i}
-            className="text-bone font-bold leading-none uppercase select-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]"
+            className="text-bone font-bold leading-[0.85] uppercase select-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]"
             style={{
-              fontSize: 'clamp(3.5rem, 16.4vw, 16rem)',
+              fontSize: 'clamp(2.75rem, 14vw, 13rem)',
               letterSpacing: '-0.04em',
               fontFamily:
                 "'Helvetica Neue', Helvetica, Arial, sans-serif",

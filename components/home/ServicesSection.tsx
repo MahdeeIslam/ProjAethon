@@ -17,9 +17,9 @@ const services = [
   },
   {
     index: '02',
-    title: 'Paid Media & Campaigns',
+    title: 'Paid Media',
     href: '/services#paid-media',
-    line: 'Paid advertising, social media strategy, and content.',
+    line: 'Paid advertising, social strategy, and content.',
     body: 'Built to reach the right people at the right moment.',
   },
   {
@@ -33,7 +33,7 @@ const services = [
     index: '04',
     title: 'Brand & Identity',
     href: '/services#brand-identity',
-    line: 'Positioning and visual system.',
+    line: 'Positioning and visual systems.',
     body: 'The voice and look your organisation communicates from.',
   },
 ]
@@ -72,17 +72,17 @@ export default function ServicesSection() {
         <div className="mt-6 h-px w-full bg-[rgba(245,245,242,0.10)]" />
 
         {/* Service cards */}
-        <RevealGroup stagger={0.06} duration={0.6} className="mt-10 grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
+        <RevealGroup stagger={0.06} duration={0.6} className="mt-10 grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:items-stretch">
           {services.map((s) => (
             <Link
               key={s.href}
               href={s.href}
-              className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] p-7 md:p-8 transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(245,245,242,0.22)] hover:bg-[rgba(255,255,255,0.05)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
+              className="group relative flex h-full min-h-[320px] flex-col overflow-hidden rounded-[20px] border border-[rgba(245,245,242,0.12)] bg-[rgba(255,255,255,0.03)] p-7 md:p-8 transition-all duration-200 hover:-translate-y-0.5 hover:border-[rgba(245,245,242,0.22)] hover:bg-[rgba(255,255,255,0.05)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/20 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian"
             >
               <span className="text-xs font-semibold tracking-[0.18em] text-bone/55">
                 {s.index}
               </span>
-              <h3 className="mt-4 text-xl font-bold uppercase tracking-tight text-bone md:text-2xl">
+              <h3 className="mt-4 min-h-[3.5rem] text-xl font-bold uppercase tracking-tight text-bone md:text-2xl">
                 {s.title}
               </h3>
               <p className="mt-3 text-sm text-bone/85 md:text-base">{s.line}</p>

@@ -57,7 +57,7 @@ function ReelTileCard({ tile }: { tile: ReelTile }) {
     <Link
       href="/portfolio"
       aria-label={`${tile.title} — ${tile.category} ${tile.year}`}
-      className={`group relative block shrink-0 overflow-hidden rounded-[22px] border border-black/10 bg-[#1c1a18] shadow-[0_4px_18px_rgba(0,0,0,0.18)] transition-all duration-300 hover:border-black/20 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(0,0,0,0.32)] focus:outline-none focus-visible:ring-2 focus-visible:ring-black/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f4f0] ${
+      className={`group relative block shrink-0 overflow-hidden rounded-[22px] border border-bone/12 bg-[#1c1a18] shadow-[0_4px_18px_rgba(0,0,0,0.32)] transition-all duration-300 hover:border-bone/25 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(0,0,0,0.55)] focus:outline-none focus-visible:ring-2 focus-visible:ring-bone/40 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian ${
         tile.format === 'vertical'
           ? 'h-[280px] w-[230px] sm:h-[340px] sm:w-[265px] md:h-[380px] md:w-[295px]'
           : 'h-[170px] w-[280px] sm:h-[200px] sm:w-[340px] md:h-[230px] md:w-[400px]'
@@ -209,36 +209,35 @@ export default function VerticalReelsCarousel() {
   return (
     <section
       id="work-in-motion"
-      className="section-padding scroll-mt-20 text-[var(--light-text)]"
-      style={{ background: 'linear-gradient(180deg, #ebe9e4 0%, #f5f4f0 50%, var(--light-bg) 100%)' }}
+      className="section-padding scroll-mt-20 bg-obsidian text-bone"
       aria-label="Work in motion"
     >
       <Container wide>
         <div className="space-y-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--light-text)]/55">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-bone/55">
                 Live reel
               </p>
-              <h2 className="text-3xl font-bold uppercase tracking-tight text-[var(--light-text)] md:text-4xl lg:text-[2.5rem]">
+              <h2 className="text-3xl font-bold uppercase tracking-tight text-bone md:text-4xl lg:text-[2.5rem]">
                 Work in motion
               </h2>
-              <p className="mt-3 max-w-xl text-sm text-[var(--light-text)]/70 md:text-base">
+              <p className="mt-3 max-w-xl text-sm text-bone/75 md:text-base">
                 A continuously refreshed wall of recent client output — from institutional campaigns to founder narratives.
               </p>
             </div>
             <Link
               href="/portfolio"
-              className="shrink-0 text-sm font-medium uppercase tracking-wider text-[var(--light-text)]/85 hover:text-[var(--light-text)] border-b-2 border-transparent hover:border-black/30 pb-0.5 transition-colors"
+              className="shrink-0 text-sm font-medium uppercase tracking-wider text-bone/85 hover:text-bone border-b-2 border-transparent hover:border-bone/30 pb-0.5 transition-colors"
             >
               View full portfolio →
             </Link>
           </div>
-          <div className="mt-2 h-px w-full bg-[var(--light-border)]" />
+          <div className="mt-2 h-px w-full bg-bone/12" />
 
           {horizontalMarqueeTiles.length > 0 && (
             <Reveal className="overflow-hidden" duration={0.6} direction="up">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--light-text)]/50">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-bone/55">
                 Horizontal reels
               </p>
               <div
@@ -254,7 +253,7 @@ export default function VerticalReelsCarousel() {
 
           {verticalMarqueeTiles.length > 0 && (
             <Reveal className="overflow-hidden pt-6" duration={0.6} direction="up">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--light-text)]/50">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-bone/55">
                 Vertical reels
               </p>
               <div
