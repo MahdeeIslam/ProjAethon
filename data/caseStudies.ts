@@ -95,9 +95,9 @@ export const caseStudies: CaseStudy[] = [
     heroImage: '/case-studies/mvm-mustafa-thumb.jpg',
     mediaLayout: 'triple-vertical',
     mediaReels: [
-      YT.verticalReels[2],
-      YT.verticalReels[3],
-      YT.verticalReels[4],
+      '/videos/case-studies/mvm-mustafa.mp4',
+      '/videos/case-studies/mvm-first.mp4',
+      '/videos/case-studies/mvm-gaza.mp4',
     ],
     relatedIds: ['2', '4'],
   },
@@ -123,7 +123,7 @@ export const caseStudies: CaseStudy[] = [
       'In four weeks the campaign raised $250,000, achieving a 7,000%+ estimated ROI driven entirely by the strength of the creative. Crucially, it established a perpetual revenue stream, securing the mosque’s financial stability for the long term — proof that authentic, cinematic storytelling drives higher conversion and deeper community loyalty than traditional outreach.',
     heroImage: '/case-studies/vmm-thumb.jpg',
     mediaLayout: 'side-vertical',
-    mediaReels: [YT.verticalReels[10]],
+    mediaReels: ['/videos/case-studies/vmm.mp4'],
     relatedIds: ['1', '5'],
   },
   {
@@ -148,7 +148,7 @@ export const caseStudies: CaseStudy[] = [
       'The strategic, rapid-response coverage transformed the tour into a high-converting digital funnel. The campaign generated over 200,000 views and drove a 400% increase in student enrolments, directly attributing 2x in revenue to the project. AETHON proved that speed and cinematic quality can coexist to drive immediate business results.',
     heroImage: '/case-studies/ar360-thumb.jpg',
     mediaLayout: 'horizontal-with-tour',
-    mediaReels: [YT.horizontalReels[0]],
+    mediaReels: ['/videos/case-studies/ar360.mp4'],
     tourPhotos: [
       '/case-studies/ar360-tour-1.jpg',
       '/case-studies/ar360-tour-2.jpg',
