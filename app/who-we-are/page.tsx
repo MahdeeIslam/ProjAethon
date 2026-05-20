@@ -181,12 +181,12 @@ export default function AboutPage() {
                 key={member.id}
                 className="flex flex-col items-center text-center"
               >
-                <div className="relative h-44 w-44 shrink-0 overflow-hidden rounded-2xl bg-bone/10 md:h-56 md:w-56">
+                <div className="relative h-64 w-52 shrink-0 overflow-hidden rounded-2xl bg-bone/10 md:h-80 md:w-64">
                   {member.image ? (
                     <img
                       src={member.image}
                       alt=""
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover object-top"
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-5xl font-bold text-bone/90">
@@ -222,12 +222,12 @@ export default function AboutPage() {
                 key={member.id}
                 className="flex flex-col items-center text-center"
               >
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-bone/10 md:h-32 md:w-32">
+                <div className="relative h-36 w-28 shrink-0 overflow-hidden rounded-2xl bg-bone/10 md:h-44 md:w-36">
                   {member.image ? (
                     <img
                       src={member.image}
                       alt=""
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover object-top"
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-2xl font-bold text-bone/90">
