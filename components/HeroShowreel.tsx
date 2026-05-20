@@ -145,9 +145,9 @@ export default function HeroShowreel() {
         {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
       </button>
 
-      <div className="relative z-10 flex min-h-screen flex-col justify-center">
+      <div className="relative z-10 flex min-h-screen flex-col justify-center pb-[28vh]">
         <Container wide>
-          <div className="max-w-[760px] py-28 md:py-32">
+          <div className="max-w-[860px] py-20 md:py-24">
             {/* Eyebrow */}
             <p
               className="kicker text-bone text-xs uppercase tracking-[0.22em] mb-5 md:text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] text-left"
@@ -164,8 +164,9 @@ export default function HeroShowreel() {
 
             {/* Headline — client-approved positioning */}
             <h1
-              className="text-4xl font-bold uppercase leading-[0.98] tracking-tight text-bone md:text-5xl lg:text-6xl xl:text-[5.25rem] drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]"
+              className="font-bold uppercase leading-[0.94] tracking-[-0.025em] text-bone drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]"
               style={{
+                fontSize: 'clamp(2.25rem, 7.1vw, 7.25rem)',
                 textShadow: '0 0 56px rgba(0,0,0,0.45)',
                 opacity: show ? 1 : 0,
                 transform: show ? 'translateY(0)' : 'translateY(20px)',
@@ -231,6 +232,36 @@ export default function HeroShowreel() {
         }}
         aria-hidden
       />
+
+      {/* Full-bleed AETHON wordmark — spans the entire bottom of the hero,
+          letter-spaced edge-to-edge in the Metropolis manner.
+          Sits above the transition gradient but below the floating controls. */}
+      <div
+        className="pointer-events-none absolute bottom-[18%] left-0 right-0 z-[4] flex justify-between px-6 md:bottom-[20%] md:px-10 lg:px-12"
+        aria-hidden
+        style={{
+          opacity: show ? 0.92 : 0,
+          transform: show ? 'translateY(0)' : 'translateY(20px)',
+          transition: reduceMotion
+            ? 'none'
+            : `opacity 1s ease-out 600ms, transform 1s ease-out 600ms`,
+        }}
+      >
+        {Array.from('AETHON').map((char, i) => (
+          <span
+            key={i}
+            className="text-bone font-bold leading-none uppercase select-none drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]"
+            style={{
+              fontSize: 'clamp(3.5rem, 16.4vw, 16rem)',
+              letterSpacing: '-0.04em',
+              fontFamily:
+                "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            }}
+          >
+            {char}
+          </span>
+        ))}
+      </div>
     </section>
   )
 }

@@ -14,20 +14,32 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="overflow-x-hidden">
-      {/* 1. Hero showreel — full-page background video + positioning */}
-      <HeroShowreel />
+      {/*
+        Metropolis-style sticky hero: the showreel is pinned to the
+        viewport (`position: sticky; top: 0; height: 100vh`) while the
+        rest of the page scrolls up and over it. Content sections sit
+        in a sibling block with a higher z-index and their own opaque
+        background so the hero is fully obscured once they're in view.
+      */}
+      <div className="relative">
+        <div className="sticky top-0 z-0 h-screen">
+          <HeroShowreel />
+        </div>
 
-      {/* 2. Work in motion — rolling reels carousel */}
-      <VerticalReelsCarousel />
+        <div className="relative z-10 bg-obsidian">
+          {/* 2. Work in motion — rolling reels carousel */}
+          <VerticalReelsCarousel />
 
-      {/* 3. Featured case studies */}
-      <FeaturedCaseStudiesModule />
+          {/* 3. Featured case studies */}
+          <FeaturedCaseStudiesModule />
 
-      {/* 4. One agency. Full capability. */}
-      <ServicesSection />
+          {/* 4. One agency. Full capability. */}
+          <ServicesSection />
 
-      {/* 5. Work with us */}
-      <HomeContactSection />
+          {/* 5. Work with us */}
+          <HomeContactSection />
+        </div>
+      </div>
     </div>
   )
 }

@@ -6,26 +6,27 @@ import StickyCTA from '@/components/StickyCTA'
 import BackToTop from '@/components/BackToTop'
 import LoadingGate from '@/components/LoadingGate'
 import BottomHeader from '@/components/BottomHeader'
-import { BRAND_NAME, BRAND_DESCRIPTION, SITE_URL, LOGO_URL } from '@/lib/brand'
+import SmoothScroll from '@/components/SmoothScroll'
+import { BRAND_NAME, BRAND_TAGLINE, BRAND_DESCRIPTION, SITE_URL, LOGO_URL } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: {
-    default: `${BRAND_NAME} | Cinematic Ihsan`,
+    default: `${BRAND_NAME} — ${BRAND_TAGLINE}`,
     template: `%s | ${BRAND_NAME}`,
   },
   description: BRAND_DESCRIPTION,
-  keywords: ['Muslim marketing agency', 'Islamic content production', 'institutional marketing', 'cinematography', 'nasheed audio', 'premium creative agency', BRAND_NAME],
+  keywords: ['creative agency', 'production', 'campaigns', 'web design', 'brand strategy', 'Melbourne', BRAND_NAME],
   authors: [{ name: BRAND_NAME }],
   openGraph: {
     type: 'website',
-    locale: 'en_US',
+    locale: 'en_AU',
     url: SITE_URL,
     siteName: BRAND_NAME,
-    title: `${BRAND_NAME} | Cinematic Ihsan`,
+    title: `${BRAND_NAME} — ${BRAND_TAGLINE}`,
     description: BRAND_DESCRIPTION,
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`, // Placeholder - replace with actual OG image
+        url: `${SITE_URL}/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: BRAND_NAME,
@@ -70,6 +71,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <SmoothScroll />
         <LoadingGate>
           <Header />
           <main>{children}</main>
